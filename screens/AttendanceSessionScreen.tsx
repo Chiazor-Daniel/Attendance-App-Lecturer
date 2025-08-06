@@ -15,27 +15,7 @@ const AttendanceSessionScreen = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        {/* Header */}
-        <View style={styles.header}>
-          <View style={styles.profileSection}>
-            <View style={styles.avatar}>
-              <Text style={styles.avatarText}>RJ</Text>
-            </View>
-            <View style={styles.greeting}>
-              <Text style={styles.greetingText}>Good Morning!</Text>
-              <Text style={styles.userName}>Raymond Joe</Text>
-            </View>
-          </View>
-          <TouchableOpacity style={styles.syncButton}>
-            <Text style={styles.syncIcon}>🔄</Text>
-            <Text style={styles.syncText}>Sync Data</Text>
-          </TouchableOpacity>
-        </View>
 
-        {/* Offline Status */}
-        <View style={styles.statusSection}>
-          <Text style={styles.statusText}>You are currently offline...</Text>
-        </View>
 
         {/* Session Details */}
         <View style={styles.sessionSection}>
@@ -82,7 +62,8 @@ const AttendanceSessionScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#f3f4f6',
+    paddingTop: 20,
   },
   scrollView: {
     flex: 1,

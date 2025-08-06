@@ -25,7 +25,7 @@ const SignUpScreen = ({ navigation } : any) => {
       Alert.alert('Passwords do not match');
       return;
     }
-    navigation.navigate('FingerprintCapture');
+    navigation.navigate('FacialRecognition');
   };
 
   const handleSignIn = () => {

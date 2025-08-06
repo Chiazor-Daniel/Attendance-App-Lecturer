@@ -7,40 +7,39 @@ import {
   SafeAreaView,
   ScrollView,
   Dimensions,
-  Image,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const { width } = Dimensions.get('window');
 
-const DashboardScreen = ({ navigation }: any) => {
+export default function DashboardScreen({ navigation }: any) {
   const [isOnline, setIsOnline] = useState(true);
 
   const classes = [
+    {
+      code: "PHY 202",
+      time: "10am",
+      color: "#8B5CF6",
+      status: "active",
+      statusText: "30:59",
+      buttonText: "Join Class",
+      buttonColor: "#8B5CF6",
+    },
+    {
+      code: "CHM 202",
+      time: "10am",
+      color: "#8B5CF6",
+      status: "upcoming",
+      statusText: "Up Next",
+      buttonText: "Join Class",
+      buttonColor: "#8B5CF6",
+    },
     {
       code: "BIO 202",
       time: "10am",
       color: "#8B5CF6",
       status: "active",
-      statusText: "30.50",
-      buttonText: "Join Class",
-      buttonColor: "#8B5CF6",
-    },
-    {
-      code: "CHM 212",
-      time: "1pm",
-      color: "#06b6d4",
-      status: "upcoming",
-      statusText: "Up Next!",
-      buttonText: "Join Class",
-      buttonColor: "#8B5CF6",
-    },
-    {
-      code: "PHY 212",
-      time: "3pm",
-      color: "#10b981",
-      status: "upcoming",
-      statusText: "Up Next!",
+      statusText: "30:59",
       buttonText: "Join Class",
       buttonColor: "#8B5CF6",
     },
@@ -51,9 +50,9 @@ const DashboardScreen = ({ navigation }: any) => {
       status: "ended",
       statusText: "Absent",
       buttonText: "Class Over",
-      buttonColor: "#9ca3af",
+      buttonColor: "#CCCCCC99",
     },
-  ]
+  ];
 
   const attendanceData = [
     { course: 'PHY 101', mon: 'present', tue: 'late', wed: 'present', thu: 'present', fri: 'present' },
@@ -63,13 +62,13 @@ const DashboardScreen = ({ navigation }: any) => {
   ];
 
   const chartData = [
-    { week: 'Week 1', percentage: 85, color: '#8B5CF6' },
-    { week: 'Week 2', percentage: 92, color: '#ec4899' },
-    { week: 'Week 3', percentage: 78, color: '#1f2937' },
-    { week: 'Week 4', percentage: 88, color: '#8B5CF6' },
-    { week: 'Week 5', percentage: 95, color: '#ec4899' },
-    { week: 'Week 6', percentage: 82, color: '#1f2937' },
-    { week: 'Week 7', percentage: 90, color: '#8B5CF6' },
+    { week: 'BIO 101', percentage: 85, color: '#8B5CF6' },
+    { week: 'PHY 101', percentage: 92, color: '#ec4899' },
+    { week: 'CHM 101', percentage: 78, color: '#1f2937' },
+    { week: 'PHS 101', percentage: 88, color: '#8B5CF6' },
+    { week: 'MTH 101', percentage: 95, color: '#ec4899' },
+    { week: 'MTH 102', percentage: 82, color: '#1f2937' },
+    { week: 'MTH 103', percentage: 90, color: '#8B5CF6' },
   ];
 
   const getStatusColor = (status: string) => {
@@ -93,39 +92,28 @@ const DashboardScreen = ({ navigation }: any) => {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        {/* Header */}
-        <View style={styles.header}>
-          <View style={styles.profileSection}>
-            <View style={styles.avatar}>
-              <Text style={styles.avatarText}>RJ</Text>
-            </View>
-            <View style={styles.greeting}>
-              <Text style={styles.greetingText}>Good Morning!</Text>
-              <Text style={styles.userName}>Raymond Joe</Text>
-            </View>
-          </View>
-          <TouchableOpacity style={styles.syncButton}>
-            <Ionicons name="sync-outline" size={20} color="white" />
-            <Text style={styles.syncText}>Sync Data</Text>
-          </TouchableOpacity>
-        </View>
 
-        {/* Schedule */}
-        <View style={styles.scheduleSection}>
-          <Text style={styles.scheduleTitle}>Day's Schedule: 12th June 2024</Text>
-          <View style={styles.classGrid}>
-        {classes.map((classItem, index) => (
-          <View key={index} style={styles.classCard}>
-            <View style={[styles.classHeader, { backgroundColor: classItem.color }]}>
+        {/* Class Cards - All four in one row */}
+        <View style={styles.classRow}>
+          {classes.map((classItem, index) => (
+            <View key={index} style={styles.classCard}>
               <Text style={styles.classTime}>{classItem.time}</Text>
               <Text style={styles.classCode}>{classItem.code}</Text>
-            </View>
-            <View style={styles.classBody}>
-              <Text style={[styles.statusText, { color: classItem.status === "ended" ? "#ef4444" : "#8B5CF6" }]}>
-                {classItem.statusText}
-              </Text>
+              
+              <View style={styles.statusContainer}>
+                {classItem.status === "active" ? (
+                  <Text style={styles.timerText}>{classItem.statusText}</Text>
+                ) : classItem.status === "upcoming" ? (
+                  <Text style={styles.upNextText}>{classItem.statusText}</Text>
+                ) : (
+                  <Text style={styles.absentText}>{classItem.statusText}</Text>
+                )}
+              </View>
+              
               <TouchableOpacity
-                style={[styles.classActionButton, { backgroundColor: classItem.buttonColor }]}
+                style={[styles.classActionButton, { 
+                  backgroundColor: classItem.buttonColor,
+                }]}
                 onPress={() => {
                   if (classItem.status !== "ended") {
                     navigation.navigate("AttendanceSession")
@@ -136,20 +124,8 @@ const DashboardScreen = ({ navigation }: any) => {
                 <Text style={styles.classActionText}>{classItem.buttonText}</Text>
               </TouchableOpacity>
             </View>
-          </View>
-        ))}
-      </View>
+          ))}
         </View>
-
-        {/* Join Class Button (when offline) */}
-        {!isOnline && (
-          <View style={styles.offlineSection}>
-            <Text style={styles.offlineText}>You are currently offline...</Text>
-            <TouchableOpacity style={styles.joinClassButton}>
-              <Text style={styles.joinClassButtonText}>Join a Class Session</Text>
-            </TouchableOpacity>
-          </View>
-        )}
 
         {/* Attendance Chart */}
         <View style={styles.chartSection}>
@@ -188,15 +164,15 @@ const DashboardScreen = ({ navigation }: any) => {
           <View style={styles.chartLegend}>
             <View style={styles.legendItem}>
               <View style={[styles.legendDot, { backgroundColor: '#8B5CF6' }]} />
-              <Text style={styles.legendText}>Current Offline</Text>
+              <Text style={styles.legendText}>Excellent (80%+)</Text>
             </View>
             <View style={styles.legendItem}>
               <View style={[styles.legendDot, { backgroundColor: '#ec4899' }]} />
-              <Text style={styles.legendText}>Saved Offline</Text>
+              <Text style={styles.legendText}>Good (60-79%)</Text>
             </View>
             <View style={styles.legendItem}>
               <View style={[styles.legendDot, { backgroundColor: '#1f2937' }]} />
-              <Text style={styles.legendText}>Missed Attendance Offline</Text>
+              <Text style={styles.legendText}>Needs Improvement {'(<60%)'}</Text>
             </View>
           </View>
         </View>
@@ -206,6 +182,21 @@ const DashboardScreen = ({ navigation }: any) => {
           <View style={styles.attendanceHeader}>
             <Text style={styles.attendanceTitle}>Current Week Attendance</Text>
             <Text style={styles.weekDropdown}>Week 10</Text>
+          </View>
+
+          <View style={styles.attendanceLegend}>
+            <View style={styles.legendItem}>
+              <View style={[styles.legendDot, { backgroundColor: '#10b981' }]} />
+              <Text style={styles.legendText}>Present</Text>
+            </View>
+            <View style={styles.legendItem}>
+              <View style={[styles.legendDot, { backgroundColor: '#f59e0b' }]} />
+              <Text style={styles.legendText}>Late</Text>
+            </View>
+            <View style={styles.legendItem}>
+              <View style={[styles.legendDot, { backgroundColor: '#ef4444' }]} />
+              <Text style={styles.legendText}>Absent</Text>
+            </View>
           </View>
           
           <View style={styles.attendanceTable}>
@@ -230,21 +221,7 @@ const DashboardScreen = ({ navigation }: any) => {
             ))}
           </View>
 
-          {/* Legend */}
-          <View style={styles.attendanceLegend}>
-            <View style={styles.legendItem}>
-              <View style={[styles.legendDot, { backgroundColor: '#10b981' }]} />
-              <Text style={styles.legendText}>Present</Text>
-            </View>
-            <View style={styles.legendItem}>
-              <View style={[styles.legendDot, { backgroundColor: '#f59e0b' }]} />
-              <Text style={styles.legendText}>Late</Text>
-            </View>
-            <View style={styles.legendItem}>
-              <View style={[styles.legendDot, { backgroundColor: '#ef4444' }]} />
-              <Text style={styles.legendText}>Absent</Text>
-            </View>
-          </View>
+        
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -254,49 +231,30 @@ const DashboardScreen = ({ navigation }: any) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#f3f4f6',
+    paddingTop: 10
   },
   scrollView: {
     flex: 1,
+    paddingHorizontal: 12,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 20,
-  },
-  profileSection: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  avatar: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: '#8B5CF6',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
-  },
-  avatarText: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 18,
+    paddingTop: 16,
+    paddingBottom: 8,
   },
   greeting: {
     flex: 1,
   },
   greetingText: {
     fontSize: 14,
-    color: '#6b7280',
-    marginBottom: 2,
+    color: '#9ca3af',
   },
   userName: {
-    fontSize: 18,
-    fontWeight: '600',
+    fontSize: 20,
+    fontWeight: '700',
     color: '#1f2937',
   },
   syncButton: {
@@ -304,67 +262,103 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 8,
-  },
-  syncIcon: {
-    color: 'white',
-    fontSize: 12,
-    marginRight: 4,
+    paddingVertical: 6,
+    borderRadius: 20,
   },
   syncText: {
     color: 'white',
     fontSize: 12,
     marginLeft: 4,
-    fontWeight: '500',
-  },
-  scheduleSection: {
-    paddingHorizontal: 20,
-    marginBottom: 24,
   },
   scheduleTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#1f2937',
-    marginBottom: 16,
-  },
- 
-  classButton: {
-    width: (width - 60) / 4,
-    height: 50,
-    borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  activeClass: {
-    borderWidth: 2,
-    borderColor: '#1f2937',
-  },
- 
-  offlineSection: {
-    paddingHorizontal: 20,
-    marginBottom: 24,
-    alignItems: 'center',
-  },
-  offlineText: {
-    fontSize: 14,
+    fontSize: 12,
     color: '#6b7280',
-    marginBottom: 12,
+    marginVertical: 8,
   },
-  joinClassButton: {
-    backgroundColor: '#8B5CF6',
-    paddingHorizontal: 32,
-    paddingVertical: 12,
+  classRow: {
+    flexDirection: 'row',
+    marginBottom: 16,
+    gap: 8,
+  },
+  classCard: {
+    width: width * 0.22,
+    backgroundColor: "white",
     borderRadius: 8,
+    // padding: 10,
+    overflow: 'hidden',
+    paddingTop: 10,
+    alignItems: "center",
+    borderWidth: 0.2,
+    borderColor: '#7303C0',
   },
-  joinClassButtonText: {
-    color: 'white',
-    fontWeight: '600',
+  classTime: {
+    color: "#6b7280",
+    fontSize: 12,
+    marginBottom: 4,
+  },
+  classCode: {
+    color: "#404040",
     fontSize: 14,
+    fontWeight: "800",
+    marginBottom: 8,
+  },
+  statusContainer: {
+    justifyContent: 'center',
+  },
+  timerText: {
+    color: '#8B5CF6',
+    fontSize: 12,
+    padding: 2,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+  upNextText: {
+    color: '#1F1F1F',
+    fontSize: 10,
+    fontWeight: '600',
+    textAlign: 'center',
+    backgroundColor: '#4167F94A',
+    padding: 2,
+    marginBottom: 2,
+    borderRadius: 2,
+  },
+  absentText: {
+    color: '#FD1D1D',
+    backgroundColor: '#FCCFCF',
+    fontSize: 10,
+    padding: 2,
+    marginBottom: 2,
+    borderRadius: 2,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+  lateText: {
+    color: '#FCCFCF',
+    backgroundColor: '#FCCFCF',
+    fontSize: 10,
+    padding: 2,
+    marginBottom: 2,
+    borderRadius: 2,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+  classActionButton: {
+    paddingHorizontal: 8,
+    paddingVertical: 6,
+    width: '100%',
+  },
+  classActionText: {
+    color: "white",
+    fontSize: 10,
+    fontWeight: "600",
+    textAlign: "center",
   },
   chartSection: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
     marginBottom: 24,
+    backgroundColor: '#ffffff',
+    borderRadius: 12,
+    padding: 16,
   },
   chartHeader: {
     flexDirection: 'row',
@@ -373,18 +367,17 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   chartTitle: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '600',
     color: '#1f2937',
   },
   weekDropdown: {
-    fontSize: 14,
+    fontSize: 12,
     color: '#6b7280',
   },
- 
   chartContainer: {
-    backgroundColor: 'white',
-    borderRadius: 12,
+    backgroundColor: '',
+    borderRadius: 8,
     padding: 16,
     marginBottom: 12,
     flexDirection: 'row',
@@ -395,7 +388,7 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   yAxisLabel: {
-    fontSize: 10,
+    fontSize: 9,
     color: '#6b7280',
     textAlign: 'right',
     width: 20,
@@ -417,8 +410,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   bar: {
-    width: 16,
-    borderRadius: 2,
+    width: 10,
+    borderRadius: 20,
     minHeight: 4,
   },
   barLabel: {
@@ -429,8 +422,9 @@ const styles = StyleSheet.create({
   },
   chartLegend: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-around',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 12,
   },
   legendItem: {
     flexDirection: 'row',
@@ -438,9 +432,9 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   legendDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+    width: 10,
+    height: 10,
+    borderRadius: 2,
     marginRight: 6,
   },
   legendText: {
@@ -448,8 +442,11 @@ const styles = StyleSheet.create({
     color: '#6b7280',
   },
   attendanceSection: {
-    paddingHorizontal: 20,
-    marginBottom: 100,
+    paddingHorizontal: 16,
+    marginBottom: 10,
+    backgroundColor: '#ffffff',
+    borderRadius: 12,
+    padding: 16,
   },
   attendanceHeader: {
     flexDirection: 'row',
@@ -458,15 +455,16 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   attendanceTitle: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '600',
     color: '#1f2937',
   },
   attendanceTable: {
-    backgroundColor: 'white',
-    borderRadius: 12,
+    backgroundColor: '#f8f9fa',
+    borderRadius: 8,
     padding: 16,
-    marginBottom: 12,
+    marginTop: 10
+    // marginBottom: 12,
   },
   tableHeader: {
     flexDirection: 'row',
@@ -477,99 +475,44 @@ const styles = StyleSheet.create({
     borderBottomColor: '#e5e7eb',
   },
   tableHeaderText: {
-    fontSize: 12,
+    fontSize: 10,
     fontWeight: '600',
     color: '#6b7280',
     flex: 1,
     textAlign: 'center',
   },
   courseColumn: {
-    flex: 1.5,
+    flex: 1.2,
     textAlign: 'left',
   },
   tableRow: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 8,
-
   },
   courseText: {
-    fontSize: 12,
+    fontSize: 10,
     fontWeight: '500',
     color: '#1f2937',
     flex: 1,
     textAlign: 'center',
   },
   statusCell: {
-    width: 24,
-    height: 24,
+    width: 15,
+    height: 25,
     borderRadius: 4,
     justifyContent: 'center',
     alignItems: 'center',
     flex: 1,
+    marginHorizontal: 1,
   },
- 
+  statusText: {
+    fontSize: 11,
+    fontWeight: "600",
+    color: 'white',
+  },
   attendanceLegend: {
     flexDirection: 'row',
     justifyContent: 'space-around',
   },
-  classGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
-    paddingHorizontal: 10,
-  },
-  classCard: {
-    width: (width - 60) / 2,
-    marginBottom: 16,
-    backgroundColor: "white",
-    borderRadius: 12,
-    overflow: "hidden",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 3,
-  },
-  classHeader: {
-    padding: 12,
-    alignItems: "center",
-  },
-  classTime: {
-    color: "white",
-    fontSize: 12,
-    fontWeight: "500",
-    marginBottom: 4,
-  },
-  classCode: {
-    color: "white",
-    fontSize: 14,
-    fontWeight: "700",
-  },
-  classBody: {
-    padding: 12,
-    alignItems: "center",
-  },
-  statusText: {
-    fontSize: 14,
-    fontWeight: "600",
-    marginBottom: 8,
-  },
-  classActionButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 6,
-    borderRadius: 6,
-    minWidth: 80,
-  },
-  classActionText: {
-    color: "white",
-    fontSize: 12,
-    fontWeight: "600",
-    textAlign: "center",
-  },
 });
-
-export default DashboardScreen;

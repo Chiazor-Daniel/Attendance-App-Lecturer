@@ -26,7 +26,7 @@ const TabIcon = ({ name, focused }: any) => {
     <View style={styles.tabItem}>
       <Ionicons 
         name={getIconName()} 
-        size={24} 
+        size={24}   
         color={focused ? '#8B5CF6' : '#6b7280'} 
         style={{ marginBottom: 4 }}
       />

@@ -18,33 +18,46 @@ import PinCreatedSuccessScreen from './screens/PinCreatedSuccessScreen';
 import TabNavigator from './navigation/TabNavigator';
 import AttendanceSessionScreen from './screens/AttendanceSessionScreen';
 import AttendanceInProgressScreen from './screens/AttendanceInProgressScreen';
+import Header from './components/header';
 
 const Stack = createStackNavigator();
+
+const screens = [
+  { name: 'Splash', component: SplashScreen, auth: true },
+  { name: 'Logo', component: LogoScreen, auth: true },
+  { name: 'SignUp', component: SignUpScreen, auth: true },
+  { name: 'SignIn', component: SignInScreen, auth: true },
+  { name: 'OTPVerification', component: OTPVerificationScreen, auth: true },
+  { name: 'FacialRecognition', component: FacialRecognitionScreen, auth: true },
+  { name: 'FacialCaptureSuccess', component: FacialCaptureSuccessScreen, auth: true },
+  { name: 'FacialCaptureFailed', component: FacialCaptureFailedScreen, auth: true },
+  { name: 'FingerprintCapture', component: FingerprintCaptureScreen, auth: true },
+  { name: 'FingerprintSuccess', component: FingerprintSuccessScreen, auth: true },
+  { name: 'FingerprintFailed', component: FingerprintFailedScreen, auth: true },
+  { name: 'CreatePin', component: CreatePinScreen, auth: true },
+  { name: 'SetPin', component: SetPinScreen, auth: true },
+  { name: 'PinCreatedSuccess', component: PinCreatedSuccessScreen, auth: true },
+  { name: 'Dashboard', component: TabNavigator},
+  { name: 'AttendanceSession', component: AttendanceSessionScreen },
+  { name: 'AttendanceInProgress', component: AttendanceInProgressScreen },
+];
 
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator 
-        initialRouteName="Splash"
-        screenOptions={{ headerShown: false }}
-      >
-        <Stack.Screen name="Splash" component={SplashScreen} />
-        <Stack.Screen name="Logo" component={LogoScreen} />
-        <Stack.Screen name="SignUp" component={SignUpScreen} />
-        <Stack.Screen name="SignIn" component={SignInScreen} />
-        <Stack.Screen name="OTPVerification" component={OTPVerificationScreen} />
-        <Stack.Screen name="FacialRecognition" component={FacialRecognitionScreen} />
-        <Stack.Screen name="FacialCaptureSuccess" component={FacialCaptureSuccessScreen} />
-        <Stack.Screen name="FacialCaptureFailed" component={FacialCaptureFailedScreen} />
-        <Stack.Screen name="FingerprintCapture" component={FingerprintCaptureScreen} />
-        <Stack.Screen name="FingerprintSuccess" component={FingerprintSuccessScreen} />
-        <Stack.Screen name="FingerprintFailed" component={FingerprintFailedScreen} />
-        <Stack.Screen name="CreatePin" component={CreatePinScreen} />
-        <Stack.Screen name="SetPin" component={SetPinScreen} />
-        <Stack.Screen name="PinCreatedSuccess" component={PinCreatedSuccessScreen} />
-        <Stack.Screen name="Dashboard" component={TabNavigator} />
-        <Stack.Screen name="AttendanceSession" component={AttendanceSessionScreen} />
-        <Stack.Screen name="AttendanceInProgress" component={AttendanceInProgressScreen} />
+      <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="Splash">
+        {screens.map(({ name, component, auth }) => (
+          <Stack.Screen
+            key={name}
+            name={name}
+            children={props => (
+              <>
+                {!auth && <Header />}
+                {React.createElement(component, props)}
+              </>
+            )}
+          />
+        ))}
       </Stack.Navigator>
     </NavigationContainer>
   );
