@@ -9,7 +9,7 @@ import {
   Switch,
 } from 'react-native';
 
-const AttendanceSessionScreen = ({ navigation }) => {
+const AttendanceSessionScreen = ({ navigation }: any) => {
   const [isOnlineMode, setIsOnlineMode] = useState(false);
 
   return (
@@ -49,7 +49,7 @@ const AttendanceSessionScreen = ({ navigation }) => {
 
           <TouchableOpacity 
             style={styles.joinButton}
-            onPress={() => navigation.navigate('AttendanceInProgress')}
+            onPress={() => navigation.navigate('JoinClassSelection')}
           >
             <Text style={styles.joinButtonText}>Join Session</Text>
           </TouchableOpacity>

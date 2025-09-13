@@ -1,10 +1,13 @@
-import React from 'react';
+import React, { use } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons';
+import { useNavigation } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
-const Header = () => {
+const Header = ({ name}: any) => {
+  const navigation = useNavigation();
   return (
-    <View style={styles.container}>
+    !name ? <View style={styles.container}>
         <View style={styles.header}>
         <View style={styles.profileSection}>
             <Image source={{uri: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=764&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'}} style={styles.avatar} />
@@ -14,7 +17,7 @@ const Header = () => {
             </View>
         </View>
         <View style={styles.headerRight}>
-            <TouchableOpacity style={styles.notificationButton}>
+            <TouchableOpacity onPress={()=>navigation.navigate("Notification")} style={styles.notificationButton}>
             <Ionicons name="notifications" size={20} color="#fff" />
             <View style={styles.notificationBadge}>
                 <Text style={styles.notificationBadgeText}>4</Text>
@@ -29,7 +32,13 @@ const Header = () => {
             <Text style={styles.syncText}>Sync Data</Text>
             </TouchableOpacity>
         </View>
-    </View>
+    </View> :   <View style={styles.header2}>
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+              <Icon name="arrow-back" size={24} color="white" />
+            </TouchableOpacity>
+            <Text style={styles.headerTitle}>{name}</Text>
+            <View style={{ width: 24 }} />
+          </View>
   );
 };
 
@@ -37,6 +46,7 @@ const styles = StyleSheet.create({
     container: {
         flexDirection: 'column',
         // alignItems: 'center',
+        
         backgroundColor: '#f3f4f6',
     },
   header: {
@@ -44,7 +54,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingTop: 10,
+    paddingTop: 14,
   },
   profileSection: {
     flexDirection: 'row',
@@ -129,6 +139,20 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 12,
     fontWeight: 'bold',
+  },
+   header2: {
+    backgroundColor: "#8B5CF6",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    paddingTop: 50,
+  },
+  headerTitle: {
+    color: "white",
+    fontSize: 18,
+    fontWeight: "600",
   },
 });
 
