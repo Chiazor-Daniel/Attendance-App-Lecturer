@@ -19,7 +19,6 @@ import TabNavigator from "./navigation/TabNavigator"
 import AttendanceSessionScreen from "./screens/AttendanceSessionScreen"
 import AttendanceInProgressScreen from "./screens/AttendanceInProgressScreen"
 
-// New session screens
 import SessionConnectedScreen from "./screens/SessionConnectedScreen"
 import SessionFailedScreen from "./screens/SessionFailedScreen"
 import SessionOverScreen from "./screens/SessionOverScreen"
