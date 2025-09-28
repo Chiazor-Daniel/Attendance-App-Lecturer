@@ -32,8 +32,26 @@
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
+	<!-- Camera Usage Description -->
+	<key>NSCameraUsageDescription</key>
+	<string>This app needs camera access to perform facial recognition for attendance verification.</string>
+	<!-- Microphone Usage Description -->
+	<key>NSMicrophoneUsageDescription</key>
+	<string>This app needs microphone access for camera functionality during facial recognition.</string>
+	<!-- Face ID Usage Description -->
+	<key>NSFaceIDUsageDescription</key>
+	<string>This app uses Face ID for secure biometric authentication and attendance verification.</string>
+	<!-- Location Usage Descriptions -->
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+	<string>This app may use location to verify attendance at specific class locations.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>This app may use location to verify attendance at specific class locations.</string>
+	<!-- Photo Library Usage (if needed for profile pictures) -->
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This app needs access to photo library to allow you to select profile pictures.</string>
+	<!-- Motion Usage (if using device motion for attendance) -->
+	<key>NSMotionUsageDescription</key>
+	<string>This app uses motion data to enhance attendance verification.</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIRequiredDeviceCapabilities</key>
