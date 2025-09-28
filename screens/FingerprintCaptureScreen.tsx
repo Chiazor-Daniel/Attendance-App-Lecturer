@@ -6,17 +6,32 @@ import {
   StyleSheet,
   SafeAreaView,
   Animated,
+  Platform,
 } from 'react-native';
+import RNBiometrics from 'react-native-biometrics';
 
-const FingerprintCaptureScreen = ({ navigation }: any) => {
+const FingerprintCaptureScreen = ({ navigation, route }: any) => {
   const [isScanning, setIsScanning] = useState(false);
   const [progress] = useState(new Animated.Value(0));
   const pulseValue = new Animated.Value(1);
 
+  // Get isClass from route params
+  const { isClass } = route.params || {};
+
+  // 🔥 Skip immediately on iOS
   useEffect(() => {
+    if (Platform.OS === 'ios') {
+      // On iOS, if this is for a class, maybe still allow fallback?
+      // But per your logic, we skip to SetPin
+      navigation.replace('SetPin');
+    }
+  }, []);
+
+  // Handle pulse animation
+  useEffect(() => {
+    let pulseAnimation: any = null;
     if (isScanning) {
-      // Pulse animation
-      const pulseAnimation = Animated.loop(
+      pulseAnimation = Animated.loop(
         Animated.sequence([
           Animated.timing(pulseValue, {
             toValue: 1.1,
@@ -28,78 +43,98 @@ const FingerprintCaptureScreen = ({ navigation }: any) => {
             duration: 800,
             useNativeDriver: true,
           }),
-        ])
+        ]),
       );
       pulseAnimation.start();
-
-      return () => pulseAnimation.stop();
     }
+    return () => pulseAnimation?.stop();
   }, [isScanning]);
 
-  const startFingerprintCapturing = () => {
+  const startFingerprintCapturing = async () => {
     setIsScanning(true);
-    
-    // Animate progress
-    Animated.timing(progress, {
-      toValue: 1,
-      duration: 3000,
-      useNativeDriver: false,
-    }).start(() => {
-      // Simulate random success/failure
-      const isSuccess = true;
-      if (isSuccess) {
-        navigation.navigate('FingerprintSuccess');
+    const rnBiometrics = new RNBiometrics();
+
+    try {
+      const { success } = await rnBiometrics.simplePrompt({
+        promptMessage: 'Place your finger on the sensor',
+        cancelButtonText: 'Cancel',
+      });
+
+      if (success) {
+        Animated.timing(progress, {
+          toValue: 1,
+          duration: 800,
+          useNativeDriver: false,
+        }).start(() => {
+          // Pass isClass to success screen
+          navigation.navigate('FingerprintSuccess', { isClass });
+        });
       } else {
-        navigation.navigate('FingerprintFailed');
+        navigation.replace('SetPin');
       }
-    });
+    } catch (error) {
+      console.warn('Fingerprint auth error:', error);
+      navigation.replace('SetPin');
+    }
   };
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
-        {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.stepText}>Step 2 of 3</Text>
-          <Text style={styles.title}>Fingerprint Capturing</Text>
-          <Text style={styles.subtitle}>
-            Place your finger on the sensor and hold still until the scan is complete.
-          </Text>
+          {isClass ? (
+            <>
+              <Text style={styles.stepText}>Join Class Session</Text>
+              <Text style={styles.title}>Fingerprint Verification</Text>
+              <Text style={styles.subtitle}>
+                Verify your identity to join the ongoing class session.
+              </Text>
+            </>
+          ) : (
+            <>
+              <Text style={styles.stepText}>Step 2 of 3</Text>
+              <Text style={styles.title}>Fingerprint Verification</Text>
+              <Text style={styles.subtitle}>
+                Place your finger on the sensor and hold still until the scan is
+                complete.
+              </Text>
+            </>
+          )}
         </View>
 
-        {/* Fingerprint Scanner */}
         <View style={styles.scannerArea}>
-          <Animated.View style={[
-            styles.fingerprintFrame,
-            isScanning && styles.scanningFrame,
-            { transform: [{ scale: isScanning ? pulseValue : 1 }] }
-          ]}>
+          <Animated.View
+            style={[
+              styles.fingerprintFrame,
+              isScanning && styles.scanningFrame,
+              { transform: [{ scale: isScanning ? pulseValue : 1 }] },
+            ]}
+          >
             <View style={styles.fingerprintContainer}>
-              {/* Fingerprint pattern */}
               <View style={styles.fingerprintPattern}>
                 {Array.from({ length: 8 }).map((_, index) => (
-                  <View 
-                    key={index} 
+                  <View
+                    key={index}
                     style={[
-                      styles.fingerprintRing, 
-                      { 
-                        width: 40 + (index * 20),
-                        height: 40 + (index * 20),
+                      styles.fingerprintRing,
+                      {
+                        width: 40 + index * 20,
+                        height: 40 + index * 20,
                         borderColor: isScanning ? '#8B5CF6' : '#d1d5db',
-                        opacity: isScanning ? 0.8 - (index * 0.1) : 0.3,
-                      }
-                    ]} 
+                        opacity: isScanning ? 0.8 - index * 0.1 : 0.3,
+                      },
+                    ]}
                   />
                 ))}
               </View>
             </View>
           </Animated.View>
-          
+
           {isScanning && (
             <View style={styles.progressContainer}>
-              <Text style={styles.scanningText}>Place your finger</Text>
+              <Text style={styles.scanningText}>Verifying...</Text>
               <View style={styles.progressBar}>
-                <Animated.View 
+                <Animated.View
                   style={[
                     styles.progressFill,
                     {
@@ -115,17 +150,22 @@ const FingerprintCaptureScreen = ({ navigation }: any) => {
           )}
         </View>
 
-        {/* Instructions */}
         <View style={styles.instructions}>
           <Text style={styles.instructionText}>
             Make sure your finger is clean and dry for the best results.
           </Text>
         </View>
 
-        {/* Button */}
         {!isScanning && (
-          <TouchableOpacity style={styles.captureButton} onPress={startFingerprintCapturing}>
-            <Text style={styles.captureButtonText}>Start Fingerprint Capturing</Text>
+          <TouchableOpacity
+            style={styles.captureButton}
+            onPress={startFingerprintCapturing}
+          >
+            <Text style={styles.captureButtonText}>
+              {isClass
+                ? 'Join Class with Fingerprint'
+                : 'Verify with Fingerprint'}
+            </Text>
           </TouchableOpacity>
         )}
       </View>
@@ -133,6 +173,7 @@ const FingerprintCaptureScreen = ({ navigation }: any) => {
   );
 };
 
+// 💖 Keep your original styles — no changes needed
 const styles = StyleSheet.create({
   container: {
     flex: 1,

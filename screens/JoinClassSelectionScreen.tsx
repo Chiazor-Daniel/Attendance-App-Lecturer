@@ -1,37 +1,48 @@
-import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView } from "react-native"
-import Icon from "react-native-vector-icons/Ionicons"
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  SafeAreaView,
+} from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 const JoinClassSelectionScreen = ({ navigation }: any) => {
   const verificationOptions = [
     {
-      title: "Facial Recognition",
-      icon: "person",
-      screen: "FacialRecognitionSetup",
+      title: 'Facial Recognition',
+      icon: 'person',
+      screen: 'FacialRecognitionSetup',
+      params: null, // No extra props
     },
     {
-      title: "Fingerprint Scan",
-      icon: "finger-print",
-      screen: "FingerprintCapture",
+      title: 'Fingerprint Scan',
+      icon: 'finger-print',
+      screen: 'FingerprintCapture',
+      params: { isClass: true }, // 👈 Prop passed here
     },
-    {
-      title: "PIN",
-      icon: "keypad",
-      screen: "CreatePin",
-    },
-  ]
+  ];
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
         <Text style={styles.title}>Join Class session</Text>
-        <Text style={styles.subtitle}>Verify your identity using any of these verification methods</Text>
+        <Text style={styles.subtitle}>
+          Verify your identity using any of these verification methods
+        </Text>
 
         <View style={styles.optionsContainer}>
           {verificationOptions.map((option, index) => (
             <TouchableOpacity
               key={index}
               style={styles.optionButton}
-              onPress={() => navigation.navigate(option.screen)}
+              onPress={() => {
+                if (option.params) {
+                  navigation.navigate(option.screen, option.params);
+                } else {
+                  navigation.navigate(option.screen);
+                }
+              }}
             >
               <View style={styles.optionIcon}>
                 <Icon name={option.icon} size={24} color="#8B5CF6" />
@@ -42,18 +53,22 @@ const JoinClassSelectionScreen = ({ navigation }: any) => {
           ))}
         </View>
 
-        <TouchableOpacity style={styles.startButton} onPress={() => navigation.navigate("FacialRecognitionSetup")}>
+        {/* Optional: Start Verification button (goes to facial with isClass if needed) */}
+        <TouchableOpacity
+          style={styles.startButton}
+          onPress={() => navigation.navigate('FacialRecognitionSetup')}
+        >
           <Text style={styles.startButtonText}>Start Verification</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f8f9fa",
+    backgroundColor: '#f8f9fa',
   },
   content: {
     flex: 1,
@@ -62,13 +77,13 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    fontWeight: "700",
-    color: "#1f2937",
+    fontWeight: '700',
+    color: '#1f2937',
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 14,
-    color: "#6b7280",
+    color: '#6b7280',
     marginBottom: 40,
     lineHeight: 20,
   },
@@ -76,13 +91,13 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   optionButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "white",
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'white',
     padding: 16,
     borderRadius: 12,
     marginBottom: 12,
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 1,
@@ -95,30 +110,30 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: "#f3f4f6",
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: '#f3f4f6',
+    justifyContent: 'center',
+    alignItems: 'center',
     marginRight: 16,
   },
   optionText: {
     flex: 1,
     fontSize: 16,
-    fontWeight: "500",
-    color: "#1f2937",
+    fontWeight: '500',
+    color: '#1f2937',
   },
   startButton: {
-    backgroundColor: "#8B5CF6",
+    backgroundColor: '#8B5CF6',
     paddingVertical: 16,
     borderRadius: 12,
-    alignItems: "center",
-    marginTop: "auto",
+    alignItems: 'center',
+    marginTop: 'auto',
     marginBottom: 20,
   },
   startButtonText: {
-    color: "white",
+    color: 'white',
     fontSize: 16,
-    fontWeight: "600",
+    fontWeight: '600',
   },
-})
+});
 
-export default JoinClassSelectionScreen
+export default JoinClassSelectionScreen;

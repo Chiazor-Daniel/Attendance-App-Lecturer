@@ -8,8 +8,9 @@ import {
   Animated,
 } from 'react-native';
 
-const FingerprintSuccessScreen = ({ navigation }: any) => {
+const FingerprintSuccessScreen = ({ navigation, route }: any) => {
   const scaleValue = new Animated.Value(0);
+  const { isClass } = route.params || {};
 
   useEffect(() => {
     Animated.spring(scaleValue, {
@@ -19,37 +20,65 @@ const FingerprintSuccessScreen = ({ navigation }: any) => {
       useNativeDriver: true,
     }).start();
 
-    // Auto navigate after 2 seconds
     const timer = setTimeout(() => {
-      navigation.navigate('SetPin');
+      if (isClass) {
+        navigation.navigate('SessionConnected');
+      } else {
+        navigation.navigate('SetPin');
+      }
     }, 2000);
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [isClass]);
+
+  const handleContinue = () => {
+    if (isClass) {
+      navigation.navigate('SessionConnected');
+    } else {
+      navigation.navigate('SetPin');
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
         <View style={styles.iconContainer}>
-          <Animated.View style={[styles.successIcon, { transform: [{ scale: scaleValue }] }]}>
+          <Animated.View
+            style={[styles.successIcon, { transform: [{ scale: scaleValue }] }]}
+          >
             <View style={styles.fingerprintIcon}>
               <Text style={styles.fingerprintText}>👆</Text>
             </View>
           </Animated.View>
         </View>
 
-        <Text style={styles.title}>FINGERPRINT SCANNED</Text>
-        <Text style={styles.subtitle}>SUCCESSFUL</Text>
+        {isClass ? (
+          <>
+            <Text style={[styles.title, { color: '#10b981' }]}>
+              CLASS SESSION
+            </Text>
+            <Text style={styles.subtitle}>JOINED SUCCESSFULLY</Text>
+            <Text style={styles.description}>
+              You've been verified and added to the class session.
+            </Text>
+          </>
+        ) : (
+          <>
+            <Text style={styles.title}>FINGERPRINT SCANNED</Text>
+            <Text style={styles.subtitle}>SUCCESSFUL</Text>
+            <Text style={styles.description}>
+              Your fingerprint has been successfully captured and verified.
+            </Text>
+          </>
+        )}
 
-        <Text style={styles.description}>
-          Your fingerprint has been successfully captured and verified.
-        </Text>
-
-        <TouchableOpacity 
-          style={styles.continueButton} 
-          onPress={() => navigation.navigate('SetPin')}
+        <TouchableOpacity
+          style={styles.continueButton}
+          onPress={handleContinue}
         >
-          <Text style={styles.continueButtonText}>Continue</Text>
+          <Text style={styles.continueButtonText}>
+            {isClass ? 'Go to Session' : 'Continue'}
+          </Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>

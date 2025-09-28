@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -6,38 +6,55 @@ import {
   StyleSheet,
   SafeAreaView,
   Animated,
-  Image,
 } from 'react-native';
+import { Camera, useCameraDevice } from 'react-native-vision-camera';
 
 const FacialRecognitionScreen = ({ navigation }: any) => {
   const [isCapturing, setIsCapturing] = useState(false);
+  const [hasPermission, setHasPermission] = useState(false);
   const [progress] = useState(new Animated.Value(0));
+  const [faceDetected, setFaceDetected] = useState(false);
+
+  const device = useCameraDevice('front');
+  const cameraRef = useRef<Camera>(null);
+
+  // Ask camera permission on mount
+  useEffect(() => {
+    (async () => {
+      const status = await Camera.requestCameraPermission();
+      setHasPermission(status === 'granted');
+    })();
+  }, []);
 
   const startFacialCapturing = () => {
+    if (!hasPermission || !device) return;
+
     setIsCapturing(true);
-    
+    setFaceDetected(true);
+
     // Animate progress
     Animated.timing(progress, {
       toValue: 1,
-      duration: 3000,
+      duration: 5000,
       useNativeDriver: false,
     }).start(() => {
-      // Simulate random success/failure
-      const isSuccess = true;
-      if (isSuccess) {
-        // Navigate to success screen (replace with your actual success screen name)
-        navigation.navigate('FacialCaptureSuccess'); 
-        console.log('Facial Capture Success!'); // For demonstration
-        setIsCapturing(false); // Reset for re-capture
-        progress.setValue(0); // Reset progress
+      if (faceDetected) {
+        navigation.navigate('FacialCaptureSuccess');
+        console.log('Facial Capture Success!');
       } else {
-        // Navigate to failure screen (replace with your actual failure screen name)
         navigation.navigate('FacialCaptureFailed');
-        console.log('Facial Capture Failed!'); // For demonstration
-        setIsCapturing(false); // Reset for re-capture
-        progress.setValue(0); // Reset progress
+        console.log('Facial Capture Failed!');
       }
+      // Reset
+      setIsCapturing(false);
+      progress.setValue(0);
     });
+  };
+
+  const handleFacesDetected = (faces: any) => {
+    if (faces.length > 0) {
+      setFaceDetected(true);
+    }
   };
 
   return (
@@ -48,28 +65,33 @@ const FacialRecognitionScreen = ({ navigation }: any) => {
           <Text style={styles.stepText}>Step 1 of 3</Text>
           <Text style={styles.title}>Facial Recognition Capturing</Text>
           <Text style={styles.subtitle}>
-            Position your face within the frame and remain still during the capture process.
+            Position your face within the frame and remain still during the
+            capture process.
           </Text>
         </View>
 
         {/* Face Frame */}
         <View style={styles.captureArea}>
-          <View style={[styles.faceFrame, isCapturing && styles.capturingFrame]}>
-            {/* Wrapper View to handle image clipping */}
-            <View style={styles.imageWrapper}>
-              <Image
-                source={{ uri: 'https://images.unsplash.com/photo-1613689036037-98c86d519b42?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1yZWxhdGVkfDg0fHx8ZW58MHx8fHx8' }}
-                resizeMode="cover" // Changed to cover
-                style={styles.faceImage}
+          <View
+            style={[styles.faceFrame, isCapturing && styles.capturingFrame]}
+          >
+            {hasPermission && device && (
+              <Camera
+                ref={cameraRef}
+                style={StyleSheet.absoluteFill}
+                device={device}
+                isActive={isCapturing}
+                faceDetectionCallback={handleFacesDetected}
+                faceDetectionOptions={{ performanceMode: 'fast' }}
               />
-            </View>
+            )}
           </View>
-          
+
           {isCapturing && (
             <View style={styles.progressContainer}>
               <Text style={styles.capturingText}>Scanning your face</Text>
               <View style={styles.progressBar}>
-                <Animated.View 
+                <Animated.View
                   style={[
                     styles.progressFill,
                     {
@@ -94,7 +116,10 @@ const FacialRecognitionScreen = ({ navigation }: any) => {
 
         {/* Button */}
         {!isCapturing && (
-          <TouchableOpacity style={styles.captureButton} onPress={startFacialCapturing}>
+          <TouchableOpacity
+            style={styles.captureButton}
+            onPress={startFacialCapturing}
+          >
             <Text style={styles.captureButtonText}>Start Facial Capturing</Text>
           </TouchableOpacity>
         )}
@@ -146,26 +171,15 @@ const styles = StyleSheet.create({
     height: 350,
     borderWidth: 3,
     borderColor: '#10b981',
-    borderRadius: 140, // This applies to the border and background of the frame
+    borderRadius: 140,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(16, 185, 129, 0.1)',
+    overflow: 'hidden', // clip camera preview into circle
   },
   capturingFrame: {
     borderColor: '#8B5CF6',
     backgroundColor: 'rgba(139, 92, 246, 0.1)',
-  },
-  // New style for image wrapper
-  imageWrapper: {
-    width: '100%',
-    height: '100%',
-    borderRadius: 140, // Apply the same border radius here
-    overflow: 'hidden', // Crucial for clipping the image
-  },
-  faceImage: {
-    width: '100%',
-    height: '100%',
-    // zIndex: 1, // Not strictly necessary here, but doesn't hurt
   },
   progressContainer: {
     marginTop: 40,
@@ -205,10 +219,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 40,
     shadowColor: '#8B5CF6',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 6,
