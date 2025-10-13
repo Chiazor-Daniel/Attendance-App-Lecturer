@@ -4,51 +4,61 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
-const Header = ({ name}: any) => {
+const Header = ({ name }: any) => {
   const navigation = useNavigation();
-  return (
-    !name ? <View style={styles.container}>
-        <View style={styles.header}>
+  return !name ? (
+    <View style={styles.container}>
+      <View style={styles.header}>
         <View style={styles.profileSection}>
-            <Image source={{uri: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=764&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'}} style={styles.avatar} />
-            <View style={styles.greeting}>
+          <Image
+            source={{
+              uri: 'https://france3-regions.franceinfo.fr/image/VrXLtAyOe0Hy7i6nGkZaEyl7Cvw/930x620/regions/2023/06/29/649d5dd285b6d_prof7.jpg',
+            }}
+            style={styles.avatar}
+          />
+          <View style={styles.greeting}>
             <Text style={styles.greetingText}>Good Morning!</Text>
-            <Text style={styles.userName}>Raymond Joe</Text>
-            </View>
+            <Text style={styles.userName}>Mr Silcko</Text>
+          </View>
         </View>
         <View style={styles.headerRight}>
-            <TouchableOpacity onPress={()=>navigation.navigate("Notification")} style={styles.notificationButton}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('Notification')}
+            style={styles.notificationButton}
+          >
             <Ionicons name="notifications" size={20} color="#fff" />
             <View style={styles.notificationBadge}>
-                <Text style={styles.notificationBadgeText}>4</Text>
+              <Text style={styles.notificationBadgeText}>4</Text>
             </View>
-            </TouchableOpacity>
+          </TouchableOpacity>
         </View>
-        </View>
-        <View style={styles.syncSection}>
-            <Text style={styles.scheduleTitle}>Day's Schedule: 12th June,2025</Text>
-            <TouchableOpacity style={styles.syncButton}>
-            <Ionicons name="sync-outline" size={16} color="white" />
-            <Text style={styles.syncText}>Sync Data</Text>
-            </TouchableOpacity>
-        </View>
-    </View> :   <View style={styles.header2}>
-            <TouchableOpacity onPress={() => navigation.goBack()}>
-              <Icon name="arrow-back" size={24} color="white" />
-            </TouchableOpacity>
-            <Text style={styles.headerTitle}>{name}</Text>
-            <View style={{ width: 24 }} />
-          </View>
+      </View>
+      <View style={styles.syncSection}>
+        <Text style={styles.scheduleTitle}>Day's Schedule: 12th June,2025</Text>
+        <TouchableOpacity style={styles.syncButton}>
+          <Ionicons name="sync-outline" size={16} color="white" />
+          <Text style={styles.syncText}>Sync Data</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  ) : (
+    <View style={styles.header2}>
+      <TouchableOpacity onPress={() => navigation.goBack()}>
+        <Icon name="arrow-back" size={24} color="white" />
+      </TouchableOpacity>
+      <Text style={styles.headerTitle}>{name}</Text>
+      <View style={{ width: 24 }} />
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flexDirection: 'column',
-        // alignItems: 'center',
-        
-        backgroundColor: '#f3f4f6',
-    },
+  container: {
+    flexDirection: 'column',
+    // alignItems: 'center',
+
+    backgroundColor: '#f3f4f6',
+  },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -104,7 +114,7 @@ const styles = StyleSheet.create({
   },
   scheduleTitle: {
     fontSize: 12,
-    fontWeight: 'bold', 
+    fontWeight: 'bold',
     backgroundColor: '#4167F914',
     padding: 5,
     borderRadius: 8,
@@ -140,19 +150,19 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: 'bold',
   },
-   header2: {
-    backgroundColor: "#8B5CF6",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+  header2: {
+    backgroundColor: '#8B5CF6',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: 20,
     paddingVertical: 16,
-    paddingTop: 50,
+    paddingTop: 20,
   },
   headerTitle: {
-    color: "white",
+    color: 'white',
     fontSize: 18,
-    fontWeight: "600",
+    fontWeight: '600',
   },
 });
 

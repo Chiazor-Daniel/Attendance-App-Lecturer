@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,49 +7,167 @@ import {
   SafeAreaView,
   ScrollView,
   Switch,
+  Alert,
 } from 'react-native';
+import BleService, { SessionInfo } from '../services/BleService';
+import { State } from 'react-native-ble-plx';
 
 const AttendanceSessionScreen = ({ navigation }: any) => {
   const [isOnlineMode, setIsOnlineMode] = useState(false);
+  const [availableSessions, setAvailableSessions] = useState<SessionInfo[]>([]);
+  const [scanning, setScanning] = useState(false);
+  const [bluetoothState, setBluetoothState] = useState<State>('Unknown');
+
+  useEffect(() => {
+    // Monitor Bluetooth state changes
+    const subscription = BleService.manager.onStateChange(state => {
+      console.log('Bluetooth state changed:', state);
+      setBluetoothState(state);
+
+      if (state !== 'PoweredOn' && isOnlineMode) {
+        setIsOnlineMode(false);
+        BleService.stopScan();
+        Alert.alert(
+          'Bluetooth Error',
+          'Please enable Bluetooth to scan for sessions',
+        );
+      }
+    }, true);
+
+    return () => {
+      subscription.remove();
+      BleService.stopScan();
+    };
+  }, [isOnlineMode]);
+
+  const handleOnlineModeToggle = async (value: boolean) => {
+    if (value && bluetoothState !== 'PoweredOn') {
+      Alert.alert(
+        'Bluetooth Required',
+        'Please enable Bluetooth to scan for sessions',
+      );
+      return;
+    }
+
+    setIsOnlineMode(value);
+    if (value) {
+      try {
+        setScanning(true);
+        BleService.scanForSessions(session => {
+          setAvailableSessions(prev => {
+            if (!prev.find(s => s.id === session.id)) {
+              return [...prev, session];
+            }
+            return prev;
+          });
+        });
+      } catch (error: any) {
+        Alert.alert('Error', error.message);
+        setIsOnlineMode(false);
+      }
+    } else {
+      BleService.stopScan();
+      setScanning(false);
+      setAvailableSessions([]);
+    }
+  };
+
+  const handleSessionSelect = async (session: SessionInfo) => {
+    try {
+      if (bluetoothState !== 'PoweredOn') {
+        throw new Error('Bluetooth must be enabled to connect to a session');
+      }
+      const device = await BleService.connectToSession(session.id);
+      navigation.navigate('JoinClassSelection', {
+        device,
+        meetingId: session.meetingId,
+        courseCode: session.courseCode,
+      });
+    } catch (error: any) {
+      Alert.alert('Connection Error', error.message);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-
-
+      <ScrollView
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Session Details */}
         <View style={styles.sessionSection}>
           <Text style={styles.sessionTitle}>Attendance Session</Text>
-          
+
           <Text style={styles.sessionDescription}>
-            Join class session with the meeting ID provided by the lecturer. Meeting ID expires after every session. Your attendance is being saved in the background and will be synced once internet connection is back.
+            Join class session with the meeting ID provided by the lecturer.
+            Meeting ID expires after every session. Your attendance is being
+            saved in the background and will be synced once internet connection
+            is back.
           </Text>
 
           <View style={styles.detailsContainer}>
-            <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>Meeting ID</Text>
-              <Text style={styles.detailValue}>Type in meeting ID</Text>
-            </View>
+            {!isOnlineMode ? (
+              <>
+                <View style={styles.detailRow}>
+                  <Text style={styles.detailLabel}>Meeting ID</Text>
+                  <Text style={styles.detailValue}>Type in meeting ID</Text>
+                </View>
 
-            <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>Course</Text>
-              <Text style={styles.detailValue}>Input course code</Text>
-            </View>
+                <View style={styles.detailRow}>
+                  <Text style={styles.detailLabel}>Course</Text>
+                  <Text style={styles.detailValue}>Input course code</Text>
+                </View>
+              </>
+            ) : (
+              <>
+                {availableSessions.map(session => (
+                  <TouchableOpacity
+                    key={session.id}
+                    style={styles.sessionItem}
+                    onPress={() => handleSessionSelect(session)}
+                  >
+                    <View style={styles.detailRow}>
+                      <Text style={styles.detailLabel}>Meeting ID</Text>
+                      <Text style={styles.detailValue}>
+                        {session.meetingId}
+                      </Text>
+                    </View>
+                    <View style={styles.detailRow}>
+                      <Text style={styles.detailLabel}>Course</Text>
+                      <Text style={styles.detailValue}>
+                        {session.courseCode}
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                ))}
+                {scanning && availableSessions.length === 0 && (
+                  <Text style={styles.scanningText}>
+                    Scanning for available sessions...
+                  </Text>
+                )}
+              </>
+            )}
 
             <View style={styles.switchRow}>
               <Text style={styles.switchLabel}>Switch to online mode</Text>
               <Switch
                 value={isOnlineMode}
-                onValueChange={setIsOnlineMode}
+                onValueChange={handleOnlineModeToggle}
                 trackColor={{ false: '#d1d5db', true: '#8B5CF6' }}
                 thumbColor={isOnlineMode ? '#ffffff' : '#ffffff'}
               />
             </View>
           </View>
 
-          <TouchableOpacity 
-            style={styles.joinButton}
-            onPress={() => navigation.navigate('JoinClassSelection')}
+          <TouchableOpacity
+            style={[
+              styles.joinButton,
+              !isOnlineMode && styles.joinButtonEnabled,
+            ]}
+            onPress={() =>
+              isOnlineMode ? null : navigation.navigate('JoinClassSelection')
+            }
+            disabled={isOnlineMode}
           >
             <Text style={styles.joinButtonText}>Join Session</Text>
           </TouchableOpacity>
@@ -67,73 +185,6 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 20,
-  },
-  profileSection: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  avatar: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: '#8B5CF6',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
-  },
-  avatarText: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 18,
-  },
-  greeting: {
-    flex: 1,
-  },
-  greetingText: {
-    fontSize: 14,
-    color: '#6b7280',
-    marginBottom: 2,
-  },
-  userName: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#1f2937',
-  },
-  syncButton: {
-    backgroundColor: '#8B5CF6',
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 8,
-  },
-  syncIcon: {
-    color: 'white',
-    fontSize: 12,
-    marginRight: 4,
-  },
-  syncText: {
-    color: 'white',
-    fontSize: 12,
-    fontWeight: '500',
-  },
-  statusSection: {
-    paddingHorizontal: 20,
-    marginBottom: 24,
-    alignItems: 'center',
-  },
-  statusText: {
-    fontSize: 14,
-    color: '#6b7280',
   },
   sessionSection: {
     paddingHorizontal: 20,
@@ -158,7 +209,7 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   detailRow: {
-    marginBottom: 24,
+    marginBottom: 20,
   },
   detailLabel: {
     fontSize: 14,
@@ -176,10 +227,19 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#e5e7eb',
   },
+  sessionItem: {
+    backgroundColor: '#f3f4f6',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#e5e7eb',
+  },
   switchRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginTop: 16,
   },
   switchLabel: {
     fontSize: 14,
@@ -191,20 +251,22 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: 'center',
-    shadowColor: '#8B5CF6',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 6,
+    opacity: 0.5,
+  },
+  joinButtonEnabled: {
+    opacity: 1,
   },
   joinButtonText: {
     color: 'white',
     fontSize: 16,
     fontWeight: '600',
     letterSpacing: 0.5,
+  },
+  scanningText: {
+    textAlign: 'center',
+    color: '#6b7280',
+    fontSize: 14,
+    marginTop: 8,
   },
 });
 

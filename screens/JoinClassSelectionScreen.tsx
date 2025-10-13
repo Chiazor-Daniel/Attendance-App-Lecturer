@@ -4,22 +4,25 @@ import {
   TouchableOpacity,
   StyleSheet,
   SafeAreaView,
+  Alert,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import BleService from '../services/BleService';
 
-const JoinClassSelectionScreen = ({ navigation }: any) => {
+const JoinClassSelectionScreen = ({ route, navigation }: any) => {
+  const { device, meetingId, courseCode } = route.params || {};
   const verificationOptions = [
     {
       title: 'Facial Recognition',
       icon: 'person',
       screen: 'FacialRecognitionSetup',
-      params: null, // No extra props
+      params: { device, meetingId, courseCode },
     },
     {
       title: 'Fingerprint Scan',
       icon: 'finger-print',
       screen: 'FingerprintCapture',
-      params: { isClass: true }, // 👈 Prop passed here
+      params: { device, meetingId, courseCode, isClass: true },
     },
   ];
 
@@ -28,7 +31,8 @@ const JoinClassSelectionScreen = ({ navigation }: any) => {
       <View style={styles.content}>
         <Text style={styles.title}>Join Class session</Text>
         <Text style={styles.subtitle}>
-          Verify your identity using any of these verification methods
+          Verify your identity using any of these verification methods for
+          course {courseCode}
         </Text>
 
         <View style={styles.optionsContainer}>
@@ -37,10 +41,15 @@ const JoinClassSelectionScreen = ({ navigation }: any) => {
               key={index}
               style={styles.optionButton}
               onPress={() => {
-                if (option.params) {
-                  navigation.navigate(option.screen, option.params);
-                } else {
-                  navigation.navigate(option.screen);
+                try {
+                  if (option.params) {
+                    navigation.navigate(option.screen, option.params);
+                  } else {
+                    navigation.navigate(option.screen);
+                  }
+                } catch (error) {
+                  Alert.alert('Error', 'Failed to start verification process');
+                  BleService.disconnectCurrentSession();
                 }
               }}
             >

@@ -1,19 +1,33 @@
-import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView } from "react-native"
-import Icon from "react-native-vector-icons/Ionicons"
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  SafeAreaView,
+  ScrollView,
+} from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 const AssignmentDetailScreen = ({ navigation, route }) => {
-  const { assignment } = route.params || {}
+  const { assignment } = route.params || {};
 
   const questions = [
-    "What is the relationship between Communication and speaking when it comes to public speaking?",
-    "What is the relationship between Communication and speaking when it comes to public speaking?",
-    "What is the relationship between Communication and speaking when it comes to public speaking?",
-    "What is the relationship between Communication and speaking when it comes to public speaking?",
-  ]
+    'What is the relationship between Communication and speaking when it comes to public speaking?',
+    'What is the relationship between Communication and speaking when it comes to public speaking?',
+    'What is the relationship between Communication and speaking when it comes to public speaking?',
+    'What is the relationship between Communication and speaking when it comes to public speaking?',
+  ];
 
   return (
     <SafeAreaView style={styles.container}>
-     
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Icon name="arrow-back" size={24} color="white" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Assignment</Text>
+        <View style={{ width: 24 }} />
+      </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         <Text style={styles.assignmentTitle}>COM 201 Assignment</Text>
@@ -45,82 +59,85 @@ const AssignmentDetailScreen = ({ navigation, route }) => {
         </View>
       </ScrollView>
     </SafeAreaView>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f8f9fa",
+    backgroundColor: 'white',
   },
   header: {
-    backgroundColor: "#8B5CF6",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    backgroundColor: '#8B5CF6',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: 20,
     paddingVertical: 16,
-    paddingTop: 50,
+    paddingTop: 20,
   },
   headerTitle: {
-    color: "white",
+    color: 'white',
     fontSize: 18,
-    fontWeight: "600",
+    fontWeight: '700',
+    flex: 1,
+    textAlign: 'center',
+    marginHorizontal: 20,
   },
   content: {
     flex: 1,
-    backgroundColor: "#f8f9fa",
+    backgroundColor: 'white',
     paddingHorizontal: 20,
     paddingTop: 20,
   },
   assignmentTitle: {
     fontSize: 18,
-    fontWeight: "600",
-    color: "#1f2937",
+    fontWeight: '700',
+    color: '#1f2937',
     marginBottom: 24,
   },
   questionsSection: {
     marginBottom: 32,
   },
   questionItem: {
-    flexDirection: "row",
+    flexDirection: 'row',
     marginBottom: 16,
-    alignItems: "flex-start",
+    alignItems: 'flex-start',
   },
   questionNumber: {
     fontSize: 14,
-    fontWeight: "600",
-    color: "#1f2937",
+    fontWeight: '600',
+    color: '#1f2937',
     marginRight: 8,
     marginTop: 2,
   },
   questionText: {
     flex: 1,
     fontSize: 14,
-    color: "#1f2937",
+    color: '#1f2937',
     lineHeight: 20,
   },
   detailsSection: {
-    backgroundColor: "#f9fafb",
+    backgroundColor: '#f9fafb',
     borderRadius: 12,
     padding: 20,
     marginBottom: 100,
   },
   detailRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     paddingVertical: 8,
   },
   detailLabel: {
     fontSize: 14,
-    color: "#6b7280",
+    color: '#6b7280',
   },
   detailValue: {
     fontSize: 14,
-    fontWeight: "500",
-    color: "#1f2937",
+    fontWeight: '500',
+    color: '#1f2937',
   },
-})
+});
 
-export default AssignmentDetailScreen
+export default AssignmentDetailScreen;

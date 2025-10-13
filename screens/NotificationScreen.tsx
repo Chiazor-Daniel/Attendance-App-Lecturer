@@ -1,96 +1,103 @@
-import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView } from "react-native"
-import Icon from "react-native-vector-icons/Ionicons"
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  SafeAreaView,
+  ScrollView,
+} from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 const NotificationScreen = ({ navigation }) => {
   const notifications = [
     {
-      date: "Today",
+      date: 'Today',
       items: [
         {
-          title: "Attendance in Progress",
-          description: "You have successfully joined this class",
-          time: "2 mins ago",
-          type: "View",
+          title: 'Attendance in Progress',
+          description: 'You have successfully joined this class',
+          time: '2 mins ago',
+          type: 'View',
         },
         {
-          title: "BIO 102 in session",
-          description: "Dr James Philip informed the start of the lecture",
-          time: "5 mins ago",
-          type: "Join Class",
+          title: 'BIO 102 in session',
+          description: 'Dr James Philip informed the start of the lecture',
+          time: '5 mins ago',
+          type: 'Join Class',
         },
         {
-          title: "CMS 212 Assignment",
-          description: "Deadline gradually approaching",
-          time: "15 mins ago",
-          type: "View",
+          title: 'CMS 212 Assignment',
+          description: 'Deadline gradually approaching',
+          time: '15 mins ago',
+          type: 'View',
         },
       ],
     },
     {
-      date: "Yesterday",
+      date: 'Yesterday',
       items: [
         {
-          title: "Attendance in Progress",
-          description: "You have successfully joined this class",
-          time: "4 mins ago",
-          type: "View",
+          title: 'Attendance in Progress',
+          description: 'You have successfully joined this class',
+          time: '4 mins ago',
+          type: 'View',
         },
         {
-          title: "BIO 102 in session",
-          description: "Dr James Philip informed the start of the lecture",
-          time: "1 hour ago",
-          type: "Join Class",
+          title: 'BIO 102 in session',
+          description: 'Dr James Philip informed the start of the lecture',
+          time: '1 hour ago',
+          type: 'Join Class',
         },
         {
-          title: "CMS 212 Assignment",
-          description: "Deadline gradually approaching",
-          time: "3 hours ago",
-          type: "View",
+          title: 'CMS 212 Assignment',
+          description: 'Deadline gradually approaching',
+          time: '3 hours ago',
+          type: 'View',
         },
       ],
     },
     {
-      date: "30 June 2025",
+      date: '30 June 2025',
       items: [
         {
-          title: "Attendance in Progress",
-          description: "You have successfully joined this class",
-          time: "2 mins ago",
-          type: "View",
+          title: 'Attendance in Progress',
+          description: 'You have successfully joined this class',
+          time: '2 mins ago',
+          type: 'View',
         },
         {
-          title: "BIO 102 in session",
-          description: "Dr James Philip informed the start of the lecture",
-          time: "4 mins ago",
-          type: "Join Class",
+          title: 'BIO 102 in session',
+          description: 'Dr James Philip informed the start of the lecture',
+          time: '4 mins ago',
+          type: 'Join Class',
         },
         {
-          title: "CMS 212 Assignment",
-          description: "Deadline gradually approaching",
-          time: "4 mins ago",
-          type: "View",
+          title: 'CMS 212 Assignment',
+          description: 'Deadline gradually approaching',
+          time: '4 mins ago',
+          type: 'View',
         },
         {
-          title: "Attendance in Progress",
-          description: "You have successfully joined this class",
-          time: "2 mins ago",
-          type: "View",
+          title: 'Attendance in Progress',
+          description: 'You have successfully joined this class',
+          time: '2 mins ago',
+          type: 'View',
         },
         {
-          title: "BIO 102 in session",
-          description: "Dr James Philip informed the start of the lecture",
-          time: "4 mins ago",
-          type: "Join Class",
+          title: 'BIO 102 in session',
+          description: 'Dr James Philip informed the start of the lecture',
+          time: '4 mins ago',
+          type: 'Join Class',
         },
         {
-          title: "CMS 212 Assignment",
-          description: "Deadline gradually approaching",
-          time: "4 mins ago",
-          type: "View",
+          title: 'CMS 212 Assignment',
+          description: 'Deadline gradually approaching',
+          time: '4 mins ago',
+          type: 'View',
         },
       ],
     },
-  ]
+  ];
 
   return (
     <SafeAreaView style={styles.container}>
@@ -114,13 +121,21 @@ const NotificationScreen = ({ navigation }) => {
                 </View>
                 <View style={styles.notificationContent}>
                   <View style={styles.notificationHeader}>
-                    <Text style={styles.notificationTitle}>{notification.title}</Text>
-                    <Text style={styles.notificationTime}>{notification.time}</Text>
+                    <Text style={styles.notificationTitle}>
+                      {notification.title}
+                    </Text>
+                    <Text style={styles.notificationTime}>
+                      {notification.time}
+                    </Text>
                   </View>
-                  <Text style={styles.notificationDescription}>{notification.description}</Text>
+                  <Text style={styles.notificationDescription}>
+                    {notification.description}
+                  </Text>
                 </View>
                 <TouchableOpacity style={styles.actionButton}>
-                  <Text style={styles.actionButtonText}>{notification.type}</Text>
+                  <Text style={styles.actionButtonText}>
+                    {notification.type}
+                  </Text>
                 </TouchableOpacity>
               </View>
             ))}
@@ -128,31 +143,31 @@ const NotificationScreen = ({ navigation }) => {
         ))}
       </ScrollView>
     </SafeAreaView>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f8f9fa",
+    backgroundColor: '#f8f9fa',
   },
   header: {
-    backgroundColor: "#8B5CF6",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    backgroundColor: '#8B5CF6',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: 20,
     paddingVertical: 16,
-    paddingTop: 30,
+    paddingTop: 20,
   },
   headerTitle: {
-    color: "white",
+    color: 'white',
     fontSize: 18,
-    fontWeight: "600",
+    fontWeight: '600',
   },
   content: {
     flex: 1,
-    backgroundColor: "white",
+    backgroundColor: 'white',
   },
   section: {
     paddingHorizontal: 20,
@@ -160,16 +175,16 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 16,
-    fontWeight: "600",
-    color: "#1f2937",
+    fontWeight: '600',
+    color: '#1f2937',
     marginBottom: 16,
   },
   notificationItem: {
-    flexDirection: "row",
-    alignItems: "flex-start",
+    flexDirection: 'row',
+    alignItems: 'flex-start',
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: "#f3f4f6",
+    borderBottomColor: '#f3f4f6',
   },
   notificationIcon: {
     marginRight: 12,
@@ -179,44 +194,44 @@ const styles = StyleSheet.create({
     width: 12,
     height: 12,
     borderRadius: 6,
-    backgroundColor: "#d1d5db",
+    backgroundColor: '#d1d5db',
   },
   notificationContent: {
     flex: 1,
     marginRight: 12,
   },
   notificationHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
     marginBottom: 4,
   },
   notificationTitle: {
     fontSize: 14,
-    fontWeight: "600",
-    color: "#1f2937",
+    fontWeight: '600',
+    color: '#1f2937',
     flex: 1,
   },
   notificationTime: {
     fontSize: 12,
-    color: "#6b7280",
+    color: '#6b7280',
   },
   notificationDescription: {
     fontSize: 12,
-    color: "#6b7280",
+    color: '#6b7280',
     lineHeight: 16,
   },
   actionButton: {
-    backgroundColor: "#8B5CF6",
+    backgroundColor: '#8B5CF6',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 6,
   },
   actionButtonText: {
-    color: "white",
+    color: 'white',
     fontSize: 12,
-    fontWeight: "500",
+    fontWeight: '500',
   },
-})
+});
 
-export default NotificationScreen
+export default NotificationScreen;
