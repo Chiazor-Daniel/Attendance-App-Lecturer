@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>This app uses Bluetooth to broadcast attendance sessions and detect nearby students.</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>This app uses Bluetooth to broadcast attendance sessions and detect nearby students.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Location access is required for Bluetooth functionality to scan for nearby devices.</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>CFBundleDisplayName</key>
+	<string>AwesomeProject</string>
+	<key>CFBundleExecutable</key>
+	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleIdentifier</key>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>$(PRODUCT_NAME)</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>$(MARKETING_VERSION)</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleVersion</key>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+	  <!-- Do not change NSAllowsArbitraryLoads to true, or you will risk app rejection! -->
+		<key>NSAllowsArbitraryLoads</key>
+		<false/>
+		<key>NSAllowsLocalNetworking</key>
+		<true/>
+	</dict>
+	<!-- Camera Usage Description -->
+	<key>NSCameraUsageDescription</key>
+	<string>This app needs camera access to perform facial recognition for attendance verification.</string>
+	<!-- Microphone Usage Description -->
+	<key>NSMicrophoneUsageDescription</key>
+	<string>This app needs microphone access for camera functionality during facial recognition.</string>
+	<!-- Face ID Usage Description -->
+	<key>NSFaceIDUsageDescription</key>
+	<string>This app uses Face ID for secure biometric authentication and attendance verification.</string>
+	<!-- Location Usage Descriptions -->
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>This app may use location to verify attendance at specific class locations.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>This app may use location to verify attendance at specific class locations.</string>
+	<!-- Photo Library Usage (if needed for profile pictures) -->
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This app needs access to photo library to allow you to select profile pictures.</string>
+	<!-- Motion Usage (if using device motion for attendance) -->
+	<key>NSMotionUsageDescription</key>
+	<string>This app uses motion data to enhance attendance verification.</string>
+	<key>UILaunchStoryboardName</key>
+	<string>LaunchScreen</string>
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>arm64</string>
+		<string>bluetooth-le</string>
+	</array>
+	<!-- Background modes for BLE -->
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>bluetooth-central</string>
+		<string>bluetooth-peripheral</string>
+	</array>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<false/>
+</dict>
+</plist>
