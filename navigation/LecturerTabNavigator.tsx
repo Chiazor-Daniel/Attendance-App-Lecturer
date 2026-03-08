@@ -14,7 +14,7 @@ export default function LecturerTabNavigator() {
       screenOptions={({ route }) => ({
         headerShown: false,
         tabBarIcon: ({ focused, color, size }) => {
-          let iconName
+          let iconName = 'help-circle'
 
           if (route.name === "Home") {
             iconName = focused ? "home" : "home-outline"
@@ -30,19 +30,16 @@ export default function LecturerTabNavigator() {
 
           return <Icon name={iconName} size={size} color={color} />
         },
+        tabBarShowLabel: false,
         tabBarActiveTintColor: "#8B5CF6",
         tabBarInactiveTintColor: "#6b7280",
         tabBarStyle: {
           backgroundColor: "white",
           borderTopWidth: 1,
           borderTopColor: "#e5e7eb",
-          paddingBottom: 5,
-          paddingTop: 5,
-          height: 60,
-        },
-        tabBarLabelStyle: {
-          fontSize: 12,
-          fontWeight: "500",
+          paddingBottom: 0,
+          paddingTop: 0,
+          height: 50,
         },
       })}
     >

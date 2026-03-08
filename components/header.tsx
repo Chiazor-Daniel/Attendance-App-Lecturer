@@ -23,7 +23,7 @@ const Header = ({ name }: any) => {
         </View>
         <View style={styles.headerRight}>
           <TouchableOpacity
-            onPress={() => navigation.navigate('Notification')}
+            onPress={() => (navigation as any).navigate('Notification')}
             style={styles.notificationButton}
           >
             <Ionicons name="notifications" size={20} color="#fff" />
@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 20,
+    paddingHorizontal: 14,
     paddingTop: 14,
   },
   profileSection: {
@@ -72,28 +72,28 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   avatar: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    marginRight: 12,
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    marginRight: 8,
     borderWidth: 1.4,
     borderColor: '#ec4899',
   },
   avatarText: {
     color: 'white',
     fontWeight: 'bold',
-    fontSize: 18,
+    fontSize: 16,
   },
   greeting: {
     flex: 1,
   },
   greetingText: {
-    fontSize: 14,
+    fontSize: 9,
     color: '#9ca3af',
-    marginBottom: 2,
+    marginBottom: 0,
   },
   userName: {
-    fontSize: 20,
+    fontSize: 13,
     fontWeight: '700',
     color: '#1f2937',
   },
@@ -101,28 +101,30 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    marginVertical: 5,
+    paddingHorizontal: 14,
+    marginVertical: 4,
   },
   syncButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginLeft: 12,
+    marginLeft: 10,
     backgroundColor: '#8B5CF6',
     borderRadius: 8,
-    padding: 8,
+    paddingVertical: 6,
+    paddingHorizontal: 10,
   },
   scheduleTitle: {
-    fontSize: 12,
+    fontSize: 10,
     fontWeight: 'bold',
     backgroundColor: '#4167F914',
-    padding: 5,
-    borderRadius: 8,
+    padding: 4,
+    borderRadius: 6,
     color: '#1f2937',
   },
   syncText: {
     color: 'white',
     marginLeft: 4,
+    fontSize: 9,
   },
   headerRight: {
     alignItems: 'center',
@@ -131,23 +133,23 @@ const styles = StyleSheet.create({
     position: 'relative',
     backgroundColor: '#8B5CF6',
     borderRadius: 8,
-    padding: 8,
-    paddingHorizontal: 12,
+    padding: 6,
+    paddingHorizontal: 10,
   },
   notificationBadge: {
     position: 'absolute',
-    top: 2,
-    right: 2,
+    top: 0,
+    right: 0,
     backgroundColor: '#E92C7E',
-    borderRadius: 50,
-    width: 20,
-    height: 20,
+    borderRadius: 9,
+    width: 18,
+    height: 18,
     justifyContent: 'center',
     alignItems: 'center',
   },
   notificationBadgeText: {
     color: 'white',
-    fontSize: 12,
+    fontSize: 10,
     fontWeight: 'bold',
   },
   header2: {
@@ -155,13 +157,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    paddingTop: 20,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    paddingTop: 14,
   },
   headerTitle: {
     color: 'white',
-    fontSize: 18,
+    fontSize: 13,
     fontWeight: '600',
   },
 });

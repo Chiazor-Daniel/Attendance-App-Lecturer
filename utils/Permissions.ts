@@ -1,158 +1,85 @@
-import { Platform, PermissionsAndroid } from 'react-native';
-import { check, PERMISSIONS, request, RESULTS } from 'react-native-permissions';
+import { Platform, Linking } from 'react-native';
+import {
+  check,
+  request,
+  PERMISSIONS,
+  RESULTS,
+  openSettings,
+  requestMultiple,
+} from 'react-native-permissions';
+import { BleManager } from 'react-native-ble-plx';
 
 export interface PermissionStatus {
   bluetooth: boolean;
   location: boolean;
   backgroundLocation?: boolean;
+  bluetoothHardwareOn?: boolean;
+  locationHardwareOn?: boolean;
+  isBlocked?: boolean;
 }
 
 class PermissionsManager {
+  private static bleManager = new BleManager();
+
   static async checkAndRequestPermissions(): Promise<PermissionStatus> {
+    const status: PermissionStatus = {
+      bluetooth: false,
+      location: false,
+      isBlocked: false,
+    };
+
     if (Platform.OS === 'android') {
-      return await this.checkAndroidPermissions();
+      const apiLevel = parseInt(Platform.Version.toString(), 10);
+
+      const permissionsToRequest = apiLevel >= 31
+        ? [
+          PERMISSIONS.ANDROID.BLUETOOTH_SCAN,
+          PERMISSIONS.ANDROID.BLUETOOTH_CONNECT,
+          PERMISSIONS.ANDROID.BLUETOOTH_ADVERTISE,
+          PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION,
+        ]
+        : [PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION];
+
+      const results = await requestMultiple(permissionsToRequest);
+
+      if (apiLevel >= 31) {
+        status.bluetooth =
+          results[PERMISSIONS.ANDROID.BLUETOOTH_SCAN] === RESULTS.GRANTED &&
+          results[PERMISSIONS.ANDROID.BLUETOOTH_CONNECT] === RESULTS.GRANTED &&
+          results[PERMISSIONS.ANDROID.BLUETOOTH_ADVERTISE] === RESULTS.GRANTED;
+
+        status.location = results[PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION] === RESULTS.GRANTED;
+
+        status.isBlocked = Object.values(results).some(res => res === RESULTS.BLOCKED);
+      } else {
+        status.bluetooth = true; // Legacy, granted via manifest
+        status.location = results[PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION] === RESULTS.GRANTED;
+        status.isBlocked = results[PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION] === RESULTS.BLOCKED;
+      }
+
     } else {
-      return await this.checkIosPermissions();
-    }
-  }
+      const results = await requestMultiple([
+        PERMISSIONS.IOS.BLUETOOTH,
+        PERMISSIONS.IOS.LOCATION_WHEN_IN_USE,
+      ]);
 
-  private static async checkAndroidPermissions(): Promise<PermissionStatus> {
-    const status: PermissionStatus = {
-      bluetooth: false,
-      location: false,
-    };
-
-    // For Android 12 and above
-    if (Platform.Version >= 31) {
-      const bluetoothScanResult = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.BLUETOOTH_SCAN,
-        {
-          title: 'Bluetooth Scan Permission',
-          message:
-            'App needs bluetooth scan permission for attendance sessions',
-          buttonPositive: 'Allow',
-        },
-      );
-
-      const bluetoothAdvertiseResult = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.BLUETOOTH_ADVERTISE,
-        {
-          title: 'Bluetooth Advertise Permission',
-          message:
-            'App needs bluetooth advertise permission for attendance sessions',
-          buttonPositive: 'Allow',
-        },
-      );
-
-      const bluetoothConnectResult = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT,
-        {
-          title: 'Bluetooth Connect Permission',
-          message:
-            'App needs bluetooth connect permission for attendance sessions',
-          buttonPositive: 'Allow',
-        },
-      );
-
-      status.bluetooth =
-        bluetoothScanResult === PermissionsAndroid.RESULTS.GRANTED &&
-        bluetoothAdvertiseResult === PermissionsAndroid.RESULTS.GRANTED &&
-        bluetoothConnectResult === PermissionsAndroid.RESULTS.GRANTED;
-    } else {
-      // For Android < 12, request legacy Bluetooth permissions
-      const legacyBluetoothResult = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.BLUETOOTH,
-        {
-          title: 'Bluetooth Permission',
-          message: 'App needs bluetooth permission for attendance sessions',
-          buttonPositive: 'Allow',
-        },
-      );
-
-      const legacyBluetoothAdminResult = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.BLUETOOTH_ADMIN,
-        {
-          title: 'Bluetooth Admin Permission',
-          message:
-            'App needs bluetooth admin permission for attendance sessions',
-          buttonPositive: 'Allow',
-        },
-      );
-
-      status.bluetooth =
-        legacyBluetoothResult === PermissionsAndroid.RESULTS.GRANTED &&
-        legacyBluetoothAdminResult === PermissionsAndroid.RESULTS.GRANTED;
+      status.bluetooth = results[PERMISSIONS.IOS.BLUETOOTH] === RESULTS.GRANTED;
+      status.location = results[PERMISSIONS.IOS.LOCATION_WHEN_IN_USE] === RESULTS.GRANTED;
+      status.isBlocked =
+        results[PERMISSIONS.IOS.BLUETOOTH] === RESULTS.BLOCKED ||
+        results[PERMISSIONS.IOS.LOCATION_WHEN_IN_USE] === RESULTS.BLOCKED;
     }
 
-    // Location permissions (required for BLE scanning on Android)
-    // First request FINE and COARSE location
-    const fineLocationResult = await PermissionsAndroid.request(
-      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-      {
-        title: 'Location Permission',
-        message:
-          'App needs precise location permission for Bluetooth functionality',
-        buttonPositive: 'Allow',
-      },
-    );
-
-    const coarseLocationResult = await PermissionsAndroid.request(
-      PermissionsAndroid.PERMISSIONS.ACCESS_COARSE_LOCATION,
-      {
-        title: 'Approximate Location Permission',
-        message: 'App needs location permission for Bluetooth functionality',
-        buttonPositive: 'Allow',
-      },
-    );
-
-    // Only request background location if the other location permissions are granted
-    let backgroundLocationResult = PermissionsAndroid.RESULTS.DENIED;
-    if (
-      fineLocationResult === PermissionsAndroid.RESULTS.GRANTED &&
-      coarseLocationResult === PermissionsAndroid.RESULTS.GRANTED
-    ) {
-      backgroundLocationResult = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.ACCESS_BACKGROUND_LOCATION,
-        {
-          title: 'Background Location Permission',
-          message:
-            'App needs background location access to scan for nearby devices even when the app is in background',
-          buttonPositive: 'Allow',
-          buttonNegative: 'Cancel',
-          buttonNeutral: 'Maybe Later',
-        },
-      );
-    }
-
-    status.location =
-      fineLocationResult === PermissionsAndroid.RESULTS.GRANTED &&
-      coarseLocationResult === PermissionsAndroid.RESULTS.GRANTED;
-    // Make background location optional since it's not critical for foreground operation
-    status.backgroundLocation =
-      backgroundLocationResult === PermissionsAndroid.RESULTS.GRANTED;
+    // Check hardware states
+    const bleState = await this.bleManager.state();
+    status.bluetoothHardwareOn = bleState === 'PoweredOn';
+    // For location hardware check, usually we'd need another lib, but for now we focus on permissions
 
     return status;
   }
 
-  private static async checkIosPermissions(): Promise<PermissionStatus> {
-    const status: PermissionStatus = {
-      bluetooth: false,
-      location: false,
-    };
-
-    // Check Bluetooth permission
-    const bluetoothResult = await check(PERMISSIONS.IOS.BLUETOOTH_PERIPHERAL);
-    if (bluetoothResult === RESULTS.DENIED) {
-      const requestResult = await request(PERMISSIONS.IOS.BLUETOOTH_PERIPHERAL);
-      status.bluetooth = requestResult === RESULTS.GRANTED;
-    } else {
-      status.bluetooth = bluetoothResult === RESULTS.GRANTED;
-    }
-
-    // iOS doesn't need location permission for BLE
-    status.location = true;
-
-    return status;
+  static async goToSettings() {
+    await openSettings();
   }
 
   static async hasRequiredPermissions(): Promise<boolean> {
@@ -162,3 +89,4 @@ class PermissionsManager {
 }
 
 export default PermissionsManager;
+

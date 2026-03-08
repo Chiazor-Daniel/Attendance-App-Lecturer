@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 
-const LecturerReportScreen = ({ navigation }) => {
+const LecturerReportScreen = ({ navigation }: { navigation: any }) => {
   const weeklyStats = [
     { label: 'Total Student Registered', count: 89, color: '#8B5CF6' },
     { label: 'Total Student Present', count: 59, color: '#10b981' },
@@ -92,7 +92,7 @@ const LecturerReportScreen = ({ navigation }) => {
     },
   ];
 
-  const getStatusIcon = status => {
+  const getStatusIcon = (status: string) => {
     switch (status) {
       case 'present':
         return { icon: '✓', color: '#10b981' };
@@ -168,7 +168,7 @@ const LecturerReportScreen = ({ navigation }) => {
                 {student.name}
               </Text>
               {['mon', 'tue', 'wed', 'thu'].map(day => {
-                const status = getStatusIcon(student[day]);
+                const status = getStatusIcon((student as any)[day]);
                 return (
                   <View
                     key={day}
@@ -199,17 +199,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    paddingTop: 20,
+    paddingHorizontal: 14,
+    paddingVertical: 14,
+    paddingTop: 14,
   },
   headerTitle: {
     color: 'white',
-    fontSize: 18,
+    fontSize: 13,
     fontWeight: '700',
     flex: 1,
     textAlign: 'center',
-    marginHorizontal: 20,
+    marginHorizontal: 14,
   },
   notificationButton: {
     padding: 4,
@@ -219,7 +219,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   statsSection: {
-    padding: 20,
+    padding: 14,
   },
   statsHeader: {
     flexDirection: 'row',
@@ -228,7 +228,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   sectionTitle: {
-    fontSize: 16,
+    fontSize: 13,
     fontWeight: '700',
     color: '#1f2937',
   },
@@ -242,7 +242,7 @@ const styles = StyleSheet.create({
   },
   exportText: {
     color: 'white',
-    fontSize: 12,
+    fontSize: 9,
     fontWeight: '600',
     marginLeft: 4,
   },
@@ -263,13 +263,13 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   courseText: {
-    fontSize: 14,
+    fontSize: 11,
     color: '#1f2937',
     marginRight: 8,
     fontWeight: '600',
   },
   weekText: {
-    fontSize: 14,
+    fontSize: 11,
     color: '#6b7280',
     marginRight: 8,
   },
@@ -280,26 +280,26 @@ const styles = StyleSheet.create({
   },
   statCard: {
     width: '48%',
-    borderRadius: 12,
-    padding: 16,
+    borderRadius: 10,
+    padding: 10,
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 10,
   },
   statCount: {
-    fontSize: 28,
+    fontSize: 20,
     fontWeight: '700',
     color: 'white',
     marginBottom: 4,
   },
   statLabel: {
-    fontSize: 12,
+    fontSize: 9,
     color: 'white',
     textAlign: 'center',
     fontWeight: '600',
   },
   tableSection: {
-    paddingHorizontal: 20,
-    paddingBottom: 100,
+    paddingHorizontal: 14,
+    paddingBottom: 40,
   },
   tableHeader: {
     flexDirection: 'row',
@@ -311,7 +311,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f9fafb',
   },
   tableHeaderText: {
-    fontSize: 12,
+    fontSize: 9,
     fontWeight: '700',
     color: '#6b7280',
     flex: 1,
@@ -328,14 +328,14 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   studentName: {
-    fontSize: 12,
+    fontSize: 11,
     color: '#1f2937',
     flex: 1,
     fontWeight: '500',
   },
   statusCell: {
-    width: 24,
-    height: 24,
+    width: 20,
+    height: 20,
     borderRadius: 4,
     justifyContent: 'center',
     alignItems: 'center',

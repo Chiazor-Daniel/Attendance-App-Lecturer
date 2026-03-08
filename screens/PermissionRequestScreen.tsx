@@ -1,94 +1,119 @@
-'use client';
-
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   Platform,
-  Image,
   SafeAreaView,
+  AppState,
 } from 'react-native';
-import PermissionsManager from '../utils/Permissions';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import PermissionsManager, { PermissionStatus } from '../utils/Permissions';
 
-interface PermissionStatus {
-  bluetooth: boolean;
-  location: boolean;
-  backgroundLocation?: boolean;
-}
-
-const PermissionRequestScreen = ({ navigation }) => {
+const PermissionRequestScreen = ({ navigation }: { navigation: any }) => {
   const [permissionStatus, setPermissionStatus] = useState<PermissionStatus>({
     bluetooth: false,
     location: false,
+    isBlocked: false,
   });
+  const appState = useRef(AppState.currentState);
 
   const checkPermissions = async () => {
     const status = await PermissionsManager.checkAndRequestPermissions();
     setPermissionStatus(status);
 
-    if (status.bluetooth && status.location) {
-      // Background location is optional
-      // All permissions granted, navigate to main app
+    if (status.bluetooth && status.location && status.bluetoothHardwareOn) {
       navigation.replace('LecturerDashboard');
     }
   };
 
   useEffect(() => {
     checkPermissions();
+
+    const subscription = AppState.addEventListener('change', nextAppState => {
+      if (
+        appState.current.match(/inactive|background/) &&
+        nextAppState === 'active'
+      ) {
+        checkPermissions();
+      }
+      appState.current = nextAppState;
+    });
+
+    return () => {
+      subscription.remove();
+    };
   }, []);
+
+  const renderPermissionItem = (
+    title: string,
+    granted: boolean,
+    icon: string,
+    hardwareStatus?: boolean
+  ) => (
+    <View style={styles.permissionItem}>
+      <View style={styles.itemLeft}>
+        <View style={[styles.iconContainer, granted && styles.iconContainerGranted]}>
+          <Ionicons name={icon} size={18} color={granted ? '#fff' : '#8B5CF6'} />
+        </View>
+        <View>
+          <Text style={styles.permissionTitle}>{title}</Text>
+          {granted && !hardwareStatus && title === 'Bluetooth' && (
+            <Text style={styles.hardwareWarning}>Hardware is turned OFF</Text>
+          )}
+        </View>
+      </View>
+      <Text style={[styles.permissionStatus, granted ? styles.statusGranted : styles.statusRequired]}>
+        {granted ? '✓ Granted' : '✕ Required'}
+      </Text>
+    </View>
+  );
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
-        {/*<Image
-          source={require('../assets/bluetooth-icon.png')}
-          style={styles.icon}
-        />*/}
+        <View style={styles.headerIcon}>
+          <Ionicons name="shield-checkmark" size={48} color="#8B5CF6" />
+        </View>
 
-        <Text style={styles.title}>Permission Required</Text>
+        <Text style={styles.title}>Permissions Required</Text>
         <Text style={styles.description}>
-          To use the attendance system, we need the following permissions:
+          To provide a seamless attendance experience, we need access to your device's connectivity features.
         </Text>
 
         <View style={styles.permissionList}>
-          <View style={styles.permissionItem}>
-            <Text style={styles.permissionTitle}>Bluetooth</Text>
-            <Text style={styles.permissionStatus}>
-              {permissionStatus.bluetooth ? '✓ Granted' : '✗ Required'}
-            </Text>
-          </View>
+          {renderPermissionItem('Bluetooth', permissionStatus.bluetooth, 'bluetooth', permissionStatus.bluetoothHardwareOn)}
+          {renderPermissionItem('Location', permissionStatus.location, 'location', true)}
 
-          {Platform.OS === 'android' && (
-            <>
-              <View style={styles.permissionItem}>
-                <Text style={styles.permissionTitle}>Location</Text>
-                <Text style={styles.permissionStatus}>
-                  {permissionStatus.location ? '✓ Granted' : '✗ Required'}
-                </Text>
-              </View>
-              <View style={styles.permissionItem}>
-                <Text style={styles.permissionTitle}>Background Location</Text>
-                <Text style={styles.permissionStatus}>
-                  {permissionStatus.backgroundLocation
-                    ? '✓ Granted'
-                    : '○ Optional'}
-                </Text>
-              </View>
-            </>
+          {permissionStatus.isBlocked && (
+            <View style={styles.blockedNotice}>
+              <Ionicons name="alert-circle" size={14} color="#ef4444" />
+              <Text style={styles.blockedText}>
+                Permissions are blocked. Enable them in settings.
+              </Text>
+            </View>
           )}
         </View>
 
-        <Text style={styles.note}>
-          {Platform.OS === 'android'
-            ? 'Location permission is required for Bluetooth functionality. Background location is optional but recommended for better performance.'
-            : 'Bluetooth is required to broadcast attendance sessions.'}
-        </Text>
+        <View style={styles.footer}>
+          {permissionStatus.isBlocked ? (
+            <TouchableOpacity
+              style={[styles.button, styles.settingsButton]}
+              onPress={() => PermissionsManager.goToSettings()}
+            >
+              <Text style={styles.buttonText}>Open Device Settings</Text>
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity style={styles.button} onPress={checkPermissions}>
+              <Text style={styles.buttonText}>Grant All Permissions</Text>
+            </TouchableOpacity>
+          )}
 
-        <TouchableOpacity style={styles.button} onPress={checkPermissions}>
-          <Text style={styles.buttonText}>Grant Permissions</Text>
-        </TouchableOpacity>
+          <Text style={styles.note}>
+            Data is encrypted and used only for attendance verification.
+          </Text>
+        </View>
       </View>
     </SafeAreaView>
   );
@@ -101,71 +126,121 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    alignItems: 'center',
+    paddingHorizontal: 14,
     justifyContent: 'center',
-    paddingHorizontal: 20,
+    alignItems: 'center',
   },
-  icon: {
-    width: 100,
-    height: 100,
-    marginBottom: 30,
-    tintColor: '#8B5CF6',
+  headerIcon: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: '#F3E8FF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
   },
   title: {
-    fontSize: 24,
+    fontSize: 15,
     fontWeight: '700',
     color: '#1f2937',
-    marginBottom: 16,
+    marginBottom: 6,
   },
   description: {
-    fontSize: 16,
+    fontSize: 10,
     color: '#6b7280',
     textAlign: 'center',
-    marginBottom: 32,
+    marginBottom: 16,
+    paddingHorizontal: 14,
   },
   permissionList: {
     width: '100%',
-    backgroundColor: '#f3f4f6',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
+    backgroundColor: '#f9fafb',
+    borderRadius: 10,
+    padding: 10,
+    marginBottom: 24,
   },
   permissionItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 12,
+    paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#e5e7eb',
+    borderBottomColor: '#f3f4f6',
+  },
+  itemLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  iconContainer: {
+    width: 32,
+    height: 32,
+    borderRadius: 6,
+    backgroundColor: '#F3E8FF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 10,
+  },
+  iconContainerGranted: {
+    backgroundColor: '#10b981',
   },
   permissionTitle: {
-    fontSize: 16,
+    fontSize: 11,
     fontWeight: '600',
     color: '#1f2937',
   },
+  hardwareWarning: {
+    fontSize: 8,
+    color: '#ef4444',
+    fontWeight: '500',
+  },
   permissionStatus: {
-    fontSize: 16,
-    color: '#6b7280',
+    fontSize: 9,
+    fontWeight: '600',
   },
-  note: {
-    fontSize: 14,
-    color: '#6b7280',
-    textAlign: 'center',
-    marginBottom: 32,
-    paddingHorizontal: 20,
+  statusGranted: {
+    color: '#10b981',
   },
-  button: {
-    backgroundColor: '#8B5CF6',
-    paddingHorizontal: 32,
-    paddingVertical: 16,
-    borderRadius: 12,
+  statusRequired: {
+    color: '#8B5CF6',
+  },
+  blockedNotice: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 8,
+    padding: 6,
+    backgroundColor: '#FEE2E2',
+    borderRadius: 6,
+  },
+  blockedText: {
+    fontSize: 8,
+    color: '#ef4444',
+    marginLeft: 4,
+    fontWeight: '600',
+  },
+  footer: {
     width: '100%',
     alignItems: 'center',
   },
+  button: {
+    backgroundColor: '#8B5CF6',
+    paddingVertical: 12,
+    borderRadius: 10,
+    width: '100%',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  settingsButton: {
+    backgroundColor: '#1f2937',
+  },
   buttonText: {
     color: 'white',
-    fontSize: 16,
+    fontSize: 11,
     fontWeight: '600',
+  },
+  note: {
+    fontSize: 8,
+    color: '#9ca3af',
+    textAlign: 'center',
   },
 });
 

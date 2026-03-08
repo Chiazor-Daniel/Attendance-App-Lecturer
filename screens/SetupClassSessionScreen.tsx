@@ -17,7 +17,7 @@ import SessionManager from '../services/SessionManager';
 import { useContext } from 'react';
 import { GlobalContext } from '../context/GlobalContext';
 
-const SetupClassSessionScreen = ({ navigation }) => {
+const SetupClassSessionScreen = ({ navigation }: { navigation: any }) => {
   const { courses } = useContext(GlobalContext);
   const [isLoading, setIsLoading] = useState(false);
   const [course, setCourse] = useState('');
@@ -48,7 +48,7 @@ const SetupClassSessionScreen = ({ navigation }) => {
     return () => {
       sessionManager.destroy();
     };
-  }, [sessionManager, globalStateRef]);
+  }, [sessionManager, courses]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -69,7 +69,7 @@ const SetupClassSessionScreen = ({ navigation }) => {
           Set up class duration and attendance window
         </Text>
 
-        <View style={styles.form}>
+        <ScrollView style={styles.form} showsVerticalScrollIndicator={false}>
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Course</Text>
             <View style={styles.pickerContainer}>
@@ -79,7 +79,7 @@ const SetupClassSessionScreen = ({ navigation }) => {
                 style={styles.picker}
               >
                 <Picker.Item label="Select a course" value="" />
-                {courseList.map(courseItem => (
+                {courseList.map((courseItem: any) => (
                   <Picker.Item
                     key={courseItem.id}
                     label={`${courseItem.code} - ${courseItem.name}`}
@@ -109,6 +109,7 @@ const SetupClassSessionScreen = ({ navigation }) => {
                 placeholderTextColor="#9ca3af"
                 value={sessionDuration}
                 onChangeText={setSessionDuration}
+                keyboardType="numeric"
               />
               <Icon name="chevron-down" size={20} color="#9ca3af" />
             </View>
@@ -123,65 +124,66 @@ const SetupClassSessionScreen = ({ navigation }) => {
                 placeholderTextColor="#9ca3af"
                 value={attendanceWindow}
                 onChangeText={setAttendanceWindow}
+                keyboardType="numeric"
               />
               <Icon name="chevron-down" size={20} color="#9ca3af" />
             </View>
           </View>
 
           {error ? <Text style={styles.errorText}>{error}</Text> : null}
+        </ScrollView>
 
-          <TouchableOpacity
-            style={[
-              styles.startButton,
-              (!course || !sessionDuration || !attendanceWindow) &&
-                styles.startButtonDisabled,
-            ]}
-            disabled={
-              !course || !sessionDuration || !attendanceWindow || isLoading
-            }
-            onPress={async () => {
-              try {
-                setIsLoading(true);
-                setError('');
+        <TouchableOpacity
+          style={[
+            styles.startButton,
+            (!course || !sessionDuration || !attendanceWindow) &&
+            styles.startButtonDisabled,
+          ]}
+          disabled={
+            !course || !sessionDuration || !attendanceWindow || isLoading
+          }
+          onPress={async () => {
+            try {
+              setIsLoading(true);
+              setError('');
 
-                const duration = parseInt(sessionDuration, 10);
-                const window = parseInt(attendanceWindow, 10);
+              const duration = parseInt(sessionDuration, 10);
+              const window = parseInt(attendanceWindow, 10);
 
-                if (isNaN(duration) || duration <= 0) {
-                  throw new Error('Invalid session duration');
-                }
-
-                if (isNaN(window) || window <= 0 || window >= duration) {
-                  throw new Error('Invalid attendance window');
-                }
-
-                const session = await sessionManager.startSession(
-                  course,
-                  duration,
-                  window,
-                );
-
-                navigation.replace('AttendanceInProgress', {
-                  sessionId: session.sessionId,
-                  courseCode: course,
-                  duration: duration,
-                  attendanceWindow: window,
-                });
-              } catch (error) {
-                setError(error.message);
-                Alert.alert('Error', error.message);
-              } finally {
-                setIsLoading(false);
+              if (isNaN(duration) || duration <= 0) {
+                throw new Error('Invalid session duration');
               }
-            }}
-          >
-            {isLoading ? (
-              <ActivityIndicator color="white" />
-            ) : (
-              <Text style={styles.startButtonText}>Start Class Session</Text>
-            )}
-          </TouchableOpacity>
-        </View>
+
+              if (isNaN(window) || window <= 0 || window >= duration) {
+                throw new Error('Invalid attendance window');
+              }
+
+              const session = await sessionManager.startSession(
+                course,
+                duration,
+                window,
+              );
+
+              navigation.replace('AttendanceInProgress', {
+                sessionId: session.sessionId,
+                courseCode: course,
+                duration: duration,
+                attendanceWindow: window,
+              });
+            } catch (error: any) {
+              setError(error.message);
+              Alert.alert('Error', error.message);
+            } finally {
+              setIsLoading(false);
+            }
+          }}
+        >
+          {isLoading ? (
+            <ActivityIndicator color="white" />
+          ) : (
+            <Text style={styles.startButtonText}>Start Class Session</Text>
+          )}
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
@@ -214,9 +216,9 @@ const styles = StyleSheet.create({
   },
   header: {
     backgroundColor: '#8B5CF6',
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 20,
+    paddingHorizontal: 14,
+    paddingTop: 14,
+    paddingBottom: 14,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -226,11 +228,11 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     color: 'white',
-    fontSize: 18,
+    fontSize: 13,
     fontWeight: '600',
     flex: 1,
     textAlign: 'center',
-    marginHorizontal: 20,
+    marginHorizontal: 14,
   },
   headerRight: {
     alignItems: 'flex-end',
@@ -264,39 +266,39 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     backgroundColor: 'white',
-    paddingHorizontal: 20,
-    paddingTop: 24,
+    paddingHorizontal: 14,
+    paddingTop: 14,
   },
   title: {
-    fontSize: 20,
+    fontSize: 17,
     fontWeight: '700',
     color: '#1f2937',
-    marginBottom: 8,
+    marginBottom: 4,
   },
   subtitle: {
-    fontSize: 14,
+    fontSize: 11,
     color: '#6b7280',
-    marginBottom: 32,
+    marginBottom: 16,
   },
   form: {
     flex: 1,
   },
   inputGroup: {
-    marginBottom: 24,
+    marginBottom: 12,
   },
   label: {
-    fontSize: 16,
+    fontSize: 12,
     fontWeight: '600',
     color: '#1f2937',
-    marginBottom: 8,
+    marginBottom: 6,
   },
   input: {
     borderWidth: 1,
     borderColor: '#e5e7eb',
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    fontSize: 16,
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    fontSize: 13,
     color: '#1f2937',
     backgroundColor: 'white',
   },
@@ -308,22 +310,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 1,
     borderColor: '#e5e7eb',
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
     backgroundColor: 'white',
   },
   startButton: {
     backgroundColor: '#8B5CF6',
-    borderRadius: 12,
-    paddingVertical: 16,
+    borderRadius: 10,
+    paddingVertical: 12,
     alignItems: 'center',
     marginTop: 'auto',
-    marginBottom: 20,
+    marginBottom: 14,
   },
   startButtonText: {
     color: 'white',
-    fontSize: 16,
+    fontSize: 13,
     fontWeight: '700',
   },
 });

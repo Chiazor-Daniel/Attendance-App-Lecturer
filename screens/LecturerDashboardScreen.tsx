@@ -12,7 +12,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import Header from '../components/header';
 const { width } = Dimensions.get('window');
 
-const LecturerDashboardScreen = ({ navigation }) => {
+const LecturerDashboardScreen = ({ navigation }: { navigation: any }) => {
   const upcomingClasses = [
     {
       time: '10am',
@@ -104,8 +104,10 @@ const LecturerDashboardScreen = ({ navigation }) => {
                 ]}
                 onPress={() => {
                   if (classItem.status !== 'ended') {
-                    navigation.navigate('SetupSessionRules', {
+                    navigation.navigate('AttendanceInProgress', {
                       courseCode: classItem.course,
+                      duration: 120, // Default 2 hours
+                      attendanceWindow: 15, // Default 15 mins
                       startTime: classItem.time,
                     });
                   }
@@ -265,30 +267,33 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
-    paddingHorizontal: 12,
+    paddingHorizontal: 14,
   },
   classRow: {
     flexDirection: 'row',
-    marginBottom: 16,
-    gap: 8,
+    marginBottom: 12,
+    gap: 10,
   },
   classCard: {
-    width: width * 0.22,
+    flex: 1,
     backgroundColor: 'white',
-    borderRadius: 8,
-    paddingTop: 10,
+    borderRadius: 10,
+    paddingTop: 8,
+    paddingBottom: 4,
     alignItems: 'center',
     borderWidth: 0.2,
     borderColor: '#e5e7eb',
+    minWidth: 70,
+    minHeight: 80,
   },
   classTime: {
     color: '#6b7280',
-    fontSize: 12,
+    fontSize: 9,
     marginBottom: 4,
   },
   classCode: {
     color: '#404040',
-    fontSize: 14,
+    fontSize: 11,
     fontWeight: '800',
     marginBottom: 8,
   },
@@ -298,14 +303,14 @@ const styles = StyleSheet.create({
   },
   timerText: {
     color: '#8B5CF6',
-    fontSize: 12,
+    fontSize: 9,
     padding: 2,
     fontWeight: '600',
     textAlign: 'center',
   },
   upNextText: {
     color: '#1F1F1F',
-    fontSize: 10,
+    fontSize: 8,
     fontWeight: '600',
     textAlign: 'center',
     backgroundColor: '#4167F94A',
@@ -316,7 +321,7 @@ const styles = StyleSheet.create({
   absentText: {
     color: '#FD1D1D',
     backgroundColor: '#FCCFCF',
-    fontSize: 10,
+    fontSize: 8,
     padding: 2,
     marginBottom: 2,
     borderRadius: 2,
@@ -328,13 +333,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 8,
-    paddingVertical: 6,
+    paddingVertical: 4,
     width: '100%',
-    borderRadius: 4,
+    borderRadius: 6,
   },
   classActionText: {
     color: 'white',
-    fontSize: 10,
+    fontSize: 8,
     fontWeight: '600',
     marginLeft: 4,
   },
@@ -353,15 +358,15 @@ const styles = StyleSheet.create({
   },
   section: {
     backgroundColor: 'white',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 20,
+    borderRadius: 10,
+    padding: 10,
+    marginBottom: 12,
   },
   sectionTitle: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '600',
     color: '#1f2937',
-    marginBottom: 12,
+    marginBottom: 10,
   },
   studentCountContainer: {
     flexDirection: 'row',
@@ -371,25 +376,25 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
     backgroundColor: '#f8f9fa',
-    padding: 12,
+    padding: 8,
     borderRadius: 8,
-    marginHorizontal: 2,
+    marginHorizontal: 1,
   },
   courseCode: {
-    fontSize: 12,
+    fontSize: 11,
     color: '#6b7280',
     marginBottom: 4,
   },
   studentCount: {
-    fontSize: 20,
+    fontSize: 17,
     fontWeight: '700',
     color: '#1f2937',
   },
   chartSection: {
     backgroundColor: 'white',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 20,
+    borderRadius: 10,
+    padding: 10,
+    marginBottom: 12,
   },
   chartHeader: {
     flexDirection: 'row',
@@ -398,25 +403,24 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   chartTitle: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '600',
     color: '#1f2937',
   },
   weekDropdown: {
-    fontSize: 12,
+    fontSize: 11,
     color: '#6b7280',
   },
   chartContainer: {
     flexDirection: 'row',
-    backgroundColor: '',
     borderRadius: 8,
-    padding: 16,
-    marginBottom: 12,
+    padding: 10,
+    marginBottom: 8,
   },
   chartYAxis: {
     justifyContent: 'space-between',
-    height: 120,
-    marginRight: 12,
+    height: 100,
+    marginRight: 8,
   },
   yAxisLabel: {
     fontSize: 9,
@@ -429,14 +433,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'flex-end',
-    height: 120,
+    height: 100,
   },
   barContainer: {
     alignItems: 'center',
     flex: 1,
   },
   barWrapper: {
-    height: 120,
+    height: 100,
     justifyContent: 'flex-end',
     alignItems: 'center',
   },
@@ -478,7 +482,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   viewAllText: {
-    fontSize: 12,
+    fontSize: 11,
     color: '#8B5CF6',
   },
   assignmentsContainer: {
@@ -489,31 +493,31 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f8f9fa',
     borderRadius: 8,
-    padding: 12,
-    marginHorizontal: 2,
+    padding: 8,
+    marginHorizontal: 1,
     alignItems: 'center',
   },
   assignmentIcon: {
-    width: 36,
-    height: 36,
+    width: 30,
+    height: 30,
     backgroundColor: '#f3f4f6',
-    borderRadius: 18,
+    borderRadius: 15,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 4,
   },
   assignmentInfo: {
     alignItems: 'center',
     marginBottom: 8,
   },
   assignmentTitle: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '600',
     color: '#1f2937',
     textAlign: 'center',
   },
   assignmentDate: {
-    fontSize: 10,
+    fontSize: 9,
     color: '#6b7280',
   },
   viewButton: {
@@ -524,47 +528,49 @@ const styles = StyleSheet.create({
   },
   viewButtonText: {
     color: 'white',
-    fontSize: 10,
+    fontSize: 9,
     fontWeight: '600',
   },
   attendanceSection: {
     backgroundColor: 'white',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 20,
+    borderRadius: 10,
+    padding: 10,
+    marginBottom: 12,
   },
   attendanceTitle: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '600',
     color: '#1f2937',
-    marginBottom: 16,
+    marginBottom: 12,
   },
   attendanceOverview: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   attendanceCircle: {
-    width: 70,
-    height: 70,
-    borderRadius: 35,
-    borderWidth: 6,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    borderWidth: 4,
     borderColor: '#10b981',
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'white',
-    marginRight: 16,
+    marginRight: 12,
   },
   attendanceNumber: {
-    fontSize: 18,
+    fontSize: 15,
     fontWeight: '700',
     color: '#1f2937',
   },
   attendanceLabel: {
-    fontSize: 10,
+    fontSize: 9,
     color: '#6b7280',
+    marginTop: -2,
   },
   attendanceLegend: {
     flex: 1,
+    gap: 4,
   },
 });
 
